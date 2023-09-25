@@ -1,0 +1,14 @@
+filename: app
+spring:
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  kafka:
+    bootstrap-servers: kafka:9092
+
+socnet:
+  vk:
+    appId: ${VK_APP_ID}
+    secretKey: ${VK_SECRET_KEY}

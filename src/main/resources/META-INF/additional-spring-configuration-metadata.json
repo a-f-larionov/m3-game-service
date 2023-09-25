@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "filename",
+      "type": "java.lang.String",
+      "description": "Description for filename, Docker use it."
+    }
+  ]
+}
