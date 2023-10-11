@@ -1,4 +1,4 @@
-package m3.users.dto.rq;
+package m3.map.and.points.dto.rs;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @EqualsAndHashCode
-@ToString(callSuper = true)
-public class UserIdRqDto {
+@ToString
+public class UserIdRsDto {
     private Long userId;
 }

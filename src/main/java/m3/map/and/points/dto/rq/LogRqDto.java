@@ -1,4 +1,4 @@
-package m3.users.dto.rq;
+package m3.map.and.points.dto.rq;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;

@@ -1,4 +1,4 @@
-package m3.users.config.kafka;
+package m3.map.and.points.config.kafka;
 
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

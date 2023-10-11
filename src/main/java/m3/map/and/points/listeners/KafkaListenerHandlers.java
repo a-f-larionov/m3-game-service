@@ -1,8 +1,8 @@
-package m3.users.listeners;
+package m3.map.and.points.listeners;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import m3.users.dto.rq.LogRqDto;
+import m3.map.and.points.dto.rq.LogRqDto;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;

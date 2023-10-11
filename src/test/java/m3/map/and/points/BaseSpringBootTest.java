@@ -1,4 +1,4 @@
-package m3.users;
+package m3.map.and.points;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;

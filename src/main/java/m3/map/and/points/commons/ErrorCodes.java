@@ -1,4 +1,4 @@
-package m3.users.commons;
+package m3.map.and.points.commons;
 
 import lombok.Getter;
 
