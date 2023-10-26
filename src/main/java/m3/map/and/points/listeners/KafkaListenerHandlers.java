@@ -2,8 +2,6 @@ package m3.map.and.points.listeners;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import m3.map.and.points.dto.rq.LogRqDto;
-import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +10,5 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @KafkaListener(topics = "topic-map-and-points", groupId = "2")
 public class KafkaListenerHandlers {
-
-    @KafkaHandler
-    public void log(LogRqDto rq) {
-        log.info(rq.toString());
-        log.info(rq.getMessage());
-    }
 
 }
