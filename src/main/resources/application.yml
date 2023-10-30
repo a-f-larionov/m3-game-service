@@ -13,7 +13,7 @@ spring:
     bootstrap-servers: kafka:9092
     consumer:
       trusted_packages: "m3.map.and.points.dto.rq"
-    topicName: 'map-and-points-topic'
+    topicName: 'topic-map-and-points'
 
   profiles:
     group:
