@@ -1,9 +1,9 @@
 package m3.map.and.points.services;
 
-import m3.map.and.points.data.MapData;
+import m3.map.and.points.dto.MapDto;
 
 public interface MapService {
     boolean existsMap(Long mapId);
 
-    MapData getById(Long mapId);
+    MapDto getById(Long mapId);
 }

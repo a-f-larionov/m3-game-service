@@ -1,8 +1,11 @@
 package m3.map.and.points.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
+@Getter
 public enum DataObjects {
 
     CELL_INVISIBLE(1, "field-none.png", "Не видна игроку."),
@@ -34,9 +37,9 @@ public enum DataObjects {
     STUFF_LIGHTNING(2011, "button-lightning-rest.png", ""),
     STUFF_SHUFFLE(2012, "button-shuffle-rest.png", ""),
     STUFF_GOLD(2013, "coing.png", ""),
-
     ;
 
+    @JsonValue
     private final int id;
     private final String image;
     private final String comment;

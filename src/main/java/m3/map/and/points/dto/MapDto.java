@@ -1,4 +1,4 @@
-package m3.map.and.points.data;
+package m3.map.and.points.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class MapData {
+public class MapDto {
 
     private Long id;
     private String src;

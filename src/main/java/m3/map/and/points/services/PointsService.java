@@ -1,10 +1,10 @@
 package m3.map.and.points.services;
 
-import m3.map.and.points.data.PointData;
+import m3.map.and.points.dto.PointDto;
 
 import java.util.List;
 
 public interface PointsService {
 
-    List<PointData> getPointsByMapId(Long mapId);
+    List<PointDto> getPointsByMapId(Long mapId);
 }
