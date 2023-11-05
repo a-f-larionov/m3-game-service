@@ -37,11 +37,12 @@ public class KafkaListenerHandlers {
 
     @KafkaHandler
     public void sendMePointTopScoreRqDto(SendMePointTopScoreRqDto rq) {
-
+        System.out.println(rq);
     }
 
     @KafkaHandler
     public void onFinish(OnFinishRqDto rq) {
+        System.out.println(rq);
         //mapService.onFinish(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getChestId());
     }
 }
