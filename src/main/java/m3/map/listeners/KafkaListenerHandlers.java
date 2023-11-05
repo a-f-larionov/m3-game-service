@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import m3.map.dto.rq.OnFinishRqDto;
 import m3.map.dto.rq.SendMeMapInfoRqDto;
+import m3.map.dto.rq.SendMePointTopScoreRqDto;
 import m3.map.dto.rq.SendMeScoresRqDto;
 import m3.map.dto.rs.GotMapInfoRsDto;
 import m3.map.mappers.MapMapper;
@@ -21,35 +22,26 @@ import org.springframework.stereotype.Component;
 public class KafkaListenerHandlers {
 
     private final MapService mapService;
-    private final PointsService pointsService;
-    private final MapMapper mapMapper;
 
     @KafkaHandler
     @SendTo("topic-client")
     public GotMapInfoRsDto sendMeMapInfoRqDto(SendMeMapInfoRqDto rq) {
-
-        if (!mapService.existsMap(rq.getMapId())) {
-            throw new RuntimeException("Map not found");
-        } else {
-            var map = mapService.getById(rq.getMapId());
-            var points = pointsService.getPointsByMapId(rq.getMapId());
-            return mapMapper.entitiestoRsDto(
-                    rq.getUserId(),
-                    rq.getMapId(),
-                    map,
-                    points
-            );
-        }
+        return mapService.getMapInfo(rq.getMapId(), rq.getUserId());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
     public GotMapInfoRsDto sendMeScoresRqDto(SendMeScoresRqDto rq) {
-        return new GotMapInfoRsDto();
+        return mapService.getScores(rq.getUserId());
+    }
+
+    @KafkaHandler
+    public void sendMePointTopScoreRqDto(SendMePointTopScoreRqDto rq) {
+
     }
 
     @KafkaHandler
     public void onFinish(OnFinishRqDto rq) {
-
+        //mapService.onFinish(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getChestId());
     }
 }
