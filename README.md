@@ -1,4 +1,4 @@
-## m3-map-and-points-service
+## m3-map-service
 
 It is a part of m3-project, see 
 [m3-compose](https://github.com/a-f-larionov/m3-compose/blob/main/README.md).
