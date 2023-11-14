@@ -14,8 +14,9 @@ public class StuffServiceImpl implements StuffService {
     }
 
     @Override
-    public void giveAHummer(Long userId, int quantity) {
-        //https://www.youtube.com/watch?v=RhTXyUERugQ&t=2027s
+    public void giveAHummer(Long userId, Long quantity) {
+        incrementStuff("hummerQty", userId, quantity);
+        //incrementStuff();
         //incrementStuff(DataStuff.STUFF_HUMMER, userId, quantity);
         //                     let updateUserInfo = function () {
         //                         DataStuff.getByUserId(cntx.userId, function (data) {
@@ -26,24 +27,43 @@ public class StuffServiceImpl implements StuffService {
     }
 
     @Override
-    public void giveALightning(Long userId, int count) {
+    public void giveALightning(Long userId, Long count) {
 
     }
 
     @Override
-    public void giveAShuffle(Long userId, int count) {
+    public void giveAShuffle(Long userId, Long count) {
 
     }
 
     @Override
-    public void giveAGold(Long userId, int count) {
+    public void giveAGold(Long userId, Long count) {
 
     }
 
-    private void incrementStuff(String fieldName, Long userId, Long quanitity){
+    private void incrementStuff(String fieldName, Long userId, Long quantity) {
+
+        userStuffRepository.incrementOne(fieldName, userId, quantity);
         //lock
         //userStuffRepository.incrementOne(fieldName, userId, count);
         //Statiscit. STUFF выдан, user stuff list
         //
+//
+//        LOCK.acquire(Keys.stuff(userId, fieldName), function (done) {
+//            setTimeout(done, 5 * 60 * 1000);
+//            DB.query("UPDATE " + tableName + "" +
+//                    " SET `" + fieldName + "` = `" + fieldName + "` + " + parseInt(quantity) +
+//                    " WHERE `userId` = " + parseInt(userId), function (data) {
+//                DataStuff.getByUserId(userId, function (stuff) {
+//                    Logs.log("vk_stuff tid:" + tid + " uid:"
+//                                    + userId + " "
+//                                    + fieldName + " +" + quantity +
+//                                    " current:" + stuff[fieldName] + " OK",
+//                            Logs.LEVEL_DEBUG, undefined, Logs.TYPE_VK_STUFF);
+//                    if (callback) callback(true, stuff[fieldName]);
+//                    done();
+//                });
+//            });
+//        });
     }
 }

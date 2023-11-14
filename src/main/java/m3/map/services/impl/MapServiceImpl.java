@@ -2,11 +2,13 @@ package m3.map.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import m3.lib.entities.UserEntity;
+import m3.lib.enums.StatisticEnum;
 import m3.lib.repositories.UsersPointRepository;
 import m3.lib.repositories.UsersRepository;
 import m3.map.data_store.MapDataStore;
 import m3.map.dto.MapDto;
 import m3.map.dto.rs.GotMapInfoRsDto;
+import m3.map.kafka.sender.CommonSender;
 import m3.map.mappers.MapMapper;
 import m3.map.services.ChestsService;
 import m3.map.services.MapService;
@@ -24,6 +26,7 @@ public class MapServiceImpl implements MapService {
     private final MapMapper mapMapper;
     private final UsersRepository usersRepository;
     private final UsersPointRepository pointRepository;
+    private final CommonSender commonSender;
 
     @Override
     public boolean existsMap(Long mapId) {
@@ -60,32 +63,29 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public void onFinish(Long userId, Long pointId, Long score, Long chestId) {
-
+        // @todo transactional one for all method
         var user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("Not found"));
 
         updateUserPoints(userId, pointId, score);
-        updateNextPoint(user, pointId);
-        openChest(userId, pointId, score, chestId);
+        updateNextPoint(user, pointId, score);
+        openChest(userId, chestId);
     }
 
     private void updateUserPoints(Long userId, Long pointId, Long score) {
         pointRepository.updateUsersPoints(userId, pointId, score);
-
+        commonSender.statistic(userId, StatisticEnum.ID_FINISH_PLAY, pointId.toString(), score.toString());
         //     TopScoreCache.flush(cntx.user.id, pointId);
-        //         Statistic.write(user.id, Statistic.ID_FINISH_PLAY, pointId, score);
-
     }
 
-    private void updateNextPoint(UserEntity user, Long pointId) {
+    private void updateNextPoint(UserEntity user, Long pointId, Long score) {
         if (user.getNextPointId() < pointId + 1) {
             usersRepository.updateNextPoint(user.getId(), pointId + 1);
+            commonSender.statistic(user.getId(), StatisticEnum.ID_LEVEL_UP, String.valueOf(pointId + 1), score.toString());
         }
-        //
-        //             Statistic.write(user.id, Statistic.ID_LEVEL_UP, pointId + 1, score);
     }
 
 
-    private void openChest(Long userId, Long pointId, Long score, Long chestId) {
+    private void openChest(Long userId, Long chestId) {
 
         if (chestId.equals(0L)) return;
 
@@ -99,6 +99,6 @@ public class MapServiceImpl implements MapService {
                 case STUFF_GOLD -> stuffService.giveAGold(userId, prize.getCount());
             }
         });
-        //                     Statistic.write(user.id, Statistic.ID_OPEN_CHEST, chestId);
+        commonSender.statistic(userId, StatisticEnum.ID_OPEN_CHEST, chestId.toString());
     }
 }

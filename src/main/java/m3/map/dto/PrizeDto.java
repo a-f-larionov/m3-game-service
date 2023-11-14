@@ -11,5 +11,5 @@ import m3.map.enums.DataObjects;
 public class PrizeDto {
 
     private DataObjects id;
-    private int count;
+    private Long count;
 }
