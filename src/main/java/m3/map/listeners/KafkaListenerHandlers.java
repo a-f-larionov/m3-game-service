@@ -43,6 +43,6 @@ public class KafkaListenerHandlers {
     @KafkaHandler
     public void onFinish(OnFinishRqDto rq) {
         System.out.println(rq);
-        //mapService.onFinish(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getChestId());
+        mapService.onFinish(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getChestId());
     }
 }

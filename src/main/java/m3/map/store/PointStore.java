@@ -1,4 +1,4 @@
-package m3.map.data_store;
+package m3.map.store;
 
 import m3.map.dto.PointDto;
 import m3.map.enums.DataObjects;
@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class PointDataStore {
+public class PointStore {
     public static final List<PointDto> points = List.of(
 
             new PointDto(1L, 10L, 100L, 200L, 300L,

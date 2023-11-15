@@ -20,6 +20,11 @@ spring:
       home: local, suppress_useless_logs, home
       local: local, suppress_useless_logs
 
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
 logging:
   level:
     root: info

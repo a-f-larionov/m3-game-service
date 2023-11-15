@@ -2,7 +2,7 @@ package m3.map.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import m3.lib.settings.MapSettings;
-import m3.map.data_store.PointDataStore;
+import m3.map.store.PointStore;
 import m3.map.dto.PointDto;
 import m3.map.services.PointsService;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class PointsServiceImpl implements PointsService {
     }
 
     public PointDto getById(Long id) {
-        return PointDataStore.points.stream()
+        return PointStore.points.stream()
                 .filter(p -> p.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Point not found"));

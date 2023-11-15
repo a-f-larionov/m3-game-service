@@ -1,10 +1,10 @@
-package m3.map.data_store;
+package m3.map.store;
 
 import m3.map.dto.MapDto;
 
 import java.util.List;
 
-public class MapDataStore {
+public class MapStore {
     public static List<MapDto> maps = List.of(
             new MapDto(1L, "map-001.png"),
             new MapDto(2L, "map-002.png"),
