@@ -2,9 +2,9 @@ package m3.map.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import m3.lib.settings.MapSettings;
-import m3.map.store.PointStore;
 import m3.map.dto.PointDto;
 import m3.map.services.PointsService;
+import m3.map.store.PointStore;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

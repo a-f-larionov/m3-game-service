@@ -1,9 +1,9 @@
 package m3.map.services.impl;
 
 import lombok.RequiredArgsConstructor;
-import m3.map.store.ChestsStore;
 import m3.map.dto.ChestDto;
 import m3.map.services.ChestsService;
+import m3.map.store.ChestsStore;
 import org.springframework.stereotype.Service;
 
 
