@@ -94,10 +94,13 @@ public class MapServiceImpl implements MapService {
         Long userPosition = userPointRepository.getTopScoreUserPosition(score, pointId, fids, userId);
 
         return topScoreMapper.toDto(
+                userId,
                 topScore.get(0).getId().getUserId(),
                 topScore.get(1).getId().getUserId(),
                 topScore.get(2).getId().getUserId(),
-                userPosition);
+                userPosition,
+                pointId
+        );
     }
 
     private void updateUserPoint(Long userId, Long pointId, Long score) {
