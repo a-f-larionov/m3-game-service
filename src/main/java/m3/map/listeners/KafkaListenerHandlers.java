@@ -7,6 +7,7 @@ import m3.map.dto.rq.SendMeMapInfoRqDto;
 import m3.map.dto.rq.SendMePointTopScoreRqDto;
 import m3.map.dto.rq.SendMeScoresRqDto;
 import m3.map.dto.rs.GotMapInfoRsDto;
+import m3.map.dto.rs.GotPointTopScoreRsDto;
 import m3.map.services.MapService;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -34,13 +35,13 @@ public class KafkaListenerHandlers {
     }
 
     @KafkaHandler
-    public void sendMePointTopScoreRqDto(SendMePointTopScoreRqDto rq) {
-        System.out.println(rq);
+    @SendTo("topic-client")
+    public GotPointTopScoreRsDto sendMePointTopScore(SendMePointTopScoreRqDto rq) {
+        return mapService.gotPointTopScore(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getFids(), rq.getChunks());
     }
 
     @KafkaHandler
     public void onFinish(OnFinishRqDto rq) {
-        System.out.println(rq);
         mapService.onFinish(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getChestId());
     }
 }

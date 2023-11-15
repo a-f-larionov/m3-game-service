@@ -1,12 +1,9 @@
 package m3.map.dto.rs;
 
+
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import m3.lib.dto.rs.UserIdRsDto;
-import m3.map.dto.MapDto;
-import m3.map.dto.PointDto;
-
-import java.util.List;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -14,9 +11,11 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class GotMapInfoRsDto extends UserIdRsDto {
+public class GotPointTopScoreRsDto extends UserIdRsDto {
 
-    private Long mapId;
-    private MapDto map;
-    private List<PointDto> points;
+    private Long pointId;
+    private Long place1Uid;
+    private Long place2Uid;
+    private Long place3Uid;
+    private Long pos;
 }

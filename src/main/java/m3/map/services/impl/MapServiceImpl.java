@@ -1,16 +1,19 @@
 package m3.map.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import m3.lib.entities.UserPointEntity;
 import m3.lib.enums.StatisticEnum;
 import m3.lib.repositories.UserPointRepository;
 import m3.lib.repositories.UserRepository;
 import m3.lib.repositories.UserStuffRepository;
 import m3.map.dto.MapDto;
 import m3.map.dto.rs.GotMapInfoRsDto;
+import m3.map.dto.rs.GotPointTopScoreRsDto;
 import m3.map.dto.rs.GotStuffRsDto;
 import m3.map.kafka.sender.CommonSender;
 import m3.map.mappers.MapMapper;
 import m3.map.mappers.StuffMapper;
+import m3.map.mappers.TopScoreMapper;
 import m3.map.services.ChestsService;
 import m3.map.services.MapService;
 import m3.map.services.PointsService;
@@ -19,6 +22,8 @@ import m3.map.store.MapStore;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -30,6 +35,7 @@ public class MapServiceImpl implements MapService {
     private final StuffService stuffService;
     private final MapMapper mapMapper;
     private final StuffMapper stuffMapper;
+    private final TopScoreMapper topScoreMapper;
     private final UserRepository userRepository;
     private final UserPointRepository userPointRepository;
     private final UserStuffRepository userStuffRepository;
@@ -79,6 +85,19 @@ public class MapServiceImpl implements MapService {
         updateUserPoint(userId, pointId, score);
         nextPointUp(userId, pointId);
         giveChest(userId, chestId);
+    }
+
+    @Override
+    public GotPointTopScoreRsDto gotPointTopScore(Long userId, Long pointId, Long score, List<Long> fids, Long chunks) {
+
+        List<UserPointEntity> topScore = userPointRepository.getTopScore(pointId, fids);
+        Long userPosition = userPointRepository.getTopScoreUserPosition(score, pointId, fids, userId);
+
+        return topScoreMapper.toDto(
+                topScore.get(0).getId().getUserId(),
+                topScore.get(1).getId().getUserId(),
+                topScore.get(2).getId().getUserId(),
+                userPosition);
     }
 
     private void updateUserPoint(Long userId, Long pointId, Long score) {
