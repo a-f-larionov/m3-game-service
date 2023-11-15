@@ -73,8 +73,8 @@ public class MapServiceImpl implements MapService {
     public void onFinish(Long userId, Long pointId, Long score, Long chestId) {
         // @todo transactional one for all method
         System.out.println("onFinish");
-        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         // check exists
+        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         updateUserPoint(userId, pointId, score);
         nextPointUp(userId, pointId);
@@ -106,7 +106,6 @@ public class MapServiceImpl implements MapService {
                 case STUFF_GOLD -> stuffService.giveAGold(userId, prize.getCount());
             }
         });
-
 
         var stuff = userStuffRepository.getByUserId(userId);
         GotStuffRsDto dto = stuffMapper.entityToDto(stuff);
