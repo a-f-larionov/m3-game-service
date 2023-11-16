@@ -1,10 +1,10 @@
 package m3.gameplay.services.impl;
 
 import lombok.RequiredArgsConstructor;
-import m3.lib.settings.MapSettings;
 import m3.gameplay.dto.PointDto;
 import m3.gameplay.services.PointsService;
 import m3.gameplay.store.PointStore;
+import m3.lib.settings.MapSettings;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

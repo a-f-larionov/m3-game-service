@@ -1,7 +1,7 @@
 package m3.gameplay.mappers;
 
-import m3.lib.entities.UserStuffEntity;
 import m3.gameplay.dto.rs.GotStuffRsDto;
+import m3.lib.entities.UserStuffEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

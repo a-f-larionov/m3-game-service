@@ -1,7 +1,7 @@
 package m3.gameplay.services.impl;
 
-import m3.lib.repositories.UserStuffRepository;
 import m3.gameplay.services.StuffService;
+import m3.lib.repositories.UserStuffRepository;
 import org.springframework.stereotype.Service;
 
 @Service

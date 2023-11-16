@@ -2,9 +2,9 @@ package m3.gameplay.dto.rs;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import m3.lib.dto.rs.UserIdRsDto;
 import m3.gameplay.dto.MapDto;
 import m3.gameplay.dto.PointDto;
+import m3.lib.dto.rs.UserIdRsDto;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
 package m3.gameplay.kafka.sender.impl;
 
 import lombok.RequiredArgsConstructor;
+import m3.gameplay.kafka.sender.CommonSender;
 import m3.lib.dto.rq.StatisticRqDto;
 import m3.lib.enums.StatisticEnum;
-import m3.gameplay.kafka.sender.CommonSender;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 

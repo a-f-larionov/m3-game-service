@@ -1,7 +1,5 @@
 package m3.gameplay.listeners;
 
-import m3.gameplay.dto.MapDto;
-import m3.gameplay.dto.PointDto;
 import m3.gameplay.dto.rq.OnFinishRqDto;
 import m3.gameplay.dto.rq.SendMeMapInfoRqDto;
 import m3.gameplay.dto.rq.SendMePointTopScoreRqDto;
@@ -14,7 +12,6 @@ import m3.gameplay.services.MapService;
 import m3.gameplay.store.MapStore;
 import m3.gameplay.store.PointStore;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 
