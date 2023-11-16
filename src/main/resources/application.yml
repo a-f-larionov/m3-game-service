@@ -2,7 +2,7 @@ filename: app
 spring:
 
   application:
-    name: map-service
+    name: gameplay-service
 
   datasource:
     url: ${DATASOURCE_URL}
@@ -12,8 +12,8 @@ spring:
   kafka:
     bootstrap-servers: kafka:9092
     consumer:
-      trusted_packages: "m3.map.dto.rq"
-    topicName: 'topic-map'
+      trusted_packages: "m3.gameplay.dto.rq"
+    topicName: 'topic-gameplay'
 
   profiles:
     group:
