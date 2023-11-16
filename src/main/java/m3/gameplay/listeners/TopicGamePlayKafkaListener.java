@@ -2,12 +2,10 @@ package m3.gameplay.listeners;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import m3.gameplay.dto.rq.OnFinishRqDto;
-import m3.gameplay.dto.rq.SendMeMapInfoRqDto;
-import m3.gameplay.dto.rq.SendMePointTopScoreRqDto;
-import m3.gameplay.dto.rq.SendMeScoresRqDto;
+import m3.gameplay.dto.rq.*;
 import m3.gameplay.dto.rs.GotMapInfoRsDto;
 import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
+import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.gameplay.services.MapService;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -18,20 +16,20 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @KafkaListener(topics = "topic-gameplay")
-public class KafkaListenerHandlers {
+public class TopicGamePlayKafkaListener {
 
     private final MapService mapService;
 
     @KafkaHandler
     @SendTo("topic-client")
     public GotMapInfoRsDto sendMeMapInfoRqDto(SendMeMapInfoRqDto rq) {
-        return mapService.getMapInfo(rq.getMapId(), rq.getUserId());
+        return mapService.getMapInfo(rq.getUserId(), rq.getMapId());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotMapInfoRsDto sendMeScoresRqDto(SendMeScoresRqDto rq) {
-        return mapService.getScores(rq.getUserId());
+    public GotScoresRsDto sendMeScoresRqDto(SendMeScoresRqDto rq) {
+        return mapService.getScores(rq.getUserId(), rq.getPids(), rq.getUids());
     }
 
     @KafkaHandler
@@ -43,5 +41,10 @@ public class KafkaListenerHandlers {
     @KafkaHandler
     public void onFinish(OnFinishRqDto rq) {
         mapService.onFinish(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getChestId());
+    }
+
+    @KafkaHandler
+    public void sendMeStuff(SendMeStuffRqDto rq) {
+        System.out.println(rq);
     }
 }

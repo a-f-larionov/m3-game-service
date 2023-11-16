@@ -1,6 +1,7 @@
 package m3.gameplay.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.lib.entities.UserPointEntity;
 import m3.lib.enums.StatisticEnum;
 import m3.lib.repositories.UserPointRepository;
@@ -13,7 +14,7 @@ import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.kafka.sender.CommonSender;
 import m3.gameplay.mappers.MapMapper;
 import m3.gameplay.mappers.StuffMapper;
-import m3.gameplay.mappers.TopScoreMapper;
+import m3.gameplay.mappers.ScoreMapper;
 import m3.gameplay.services.ChestsService;
 import m3.gameplay.services.MapService;
 import m3.gameplay.services.PointsService;
@@ -35,7 +36,7 @@ public class MapServiceImpl implements MapService {
     private final StuffService stuffService;
     private final MapMapper mapMapper;
     private final StuffMapper stuffMapper;
-    private final TopScoreMapper topScoreMapper;
+    private final ScoreMapper scoreMapper;
     private final UserRepository userRepository;
     private final UserPointRepository userPointRepository;
     private final UserStuffRepository userStuffRepository;
@@ -57,7 +58,8 @@ public class MapServiceImpl implements MapService {
     }
 
     @Override
-    public GotMapInfoRsDto getMapInfo(Long mapId, Long userId) {
+    public GotMapInfoRsDto getMapInfo(Long userId, Long mapId) {
+        // @todo user set to first positions
         var map = getById(mapId);
         var points = pointsService.getPointsByMapId(mapId);
         return mapMapper.entitiestoRsDto(
@@ -69,16 +71,14 @@ public class MapServiceImpl implements MapService {
     }
 
     @Override
-    public GotMapInfoRsDto getScores(Long userId) {
-        GotMapInfoRsDto gotMapInfoRsDto = new GotMapInfoRsDto();
-        gotMapInfoRsDto.setUserId(userId);
-        return gotMapInfoRsDto;
+    public GotScoresRsDto getScores(Long userId, List<Long> pids, List<Long> uids) {
+        List<UserPointEntity> scores = userPointRepository.getScores(pids, uids);
+        return scoreMapper.toDto(userId, scores );
     }
 
     @Override
     public void onFinish(Long userId, Long pointId, Long score, Long chestId) {
         // @todo transactional one for all method
-        System.out.println("onFinish");
         // check exists
         userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -93,7 +93,7 @@ public class MapServiceImpl implements MapService {
         List<UserPointEntity> topScore = userPointRepository.getTopScore(pointId, fids);
         Long userPosition = userPointRepository.getTopScoreUserPosition(score, pointId, fids, userId);
 
-        return topScoreMapper.toDto(
+        return scoreMapper.toDto(
                 userId,
                 topScore.get(0).getId().getUserId(),
                 topScore.get(1).getId().getUserId(),
@@ -114,7 +114,7 @@ public class MapServiceImpl implements MapService {
         commonSender.statistic(userId, StatisticEnum.ID_LEVEL_UP, String.valueOf(pointId + 1));
     }
 
-    private void giveChest(Long userId, Long chestId) {
+    public void giveChest(Long userId, Long chestId) {
         // zero means - no chest to open
         if (chestId.equals(0L)) return;
 
