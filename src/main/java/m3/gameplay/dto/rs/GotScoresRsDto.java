@@ -15,5 +15,6 @@ import java.util.List;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class GotScoresRsDto extends UserIdRsDto {
+
     List<ScoreRsDto> rows;
 }

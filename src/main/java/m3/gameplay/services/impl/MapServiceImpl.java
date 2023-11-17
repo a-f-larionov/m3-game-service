@@ -73,7 +73,7 @@ public class MapServiceImpl implements MapService {
     @Override
     public GotScoresRsDto getScores(Long userId, List<Long> pids, List<Long> uids) {
         List<UserPointEntity> scores = userPointRepository.getScores(pids, uids);
-        return scoreMapper.toDto(userId, scores );
+        return scoreMapper.toDto(userId, scores);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class MapServiceImpl implements MapService {
     }
 
     @Override
-    public GotPointTopScoreRsDto gotPointTopScore(Long userId, Long pointId, Long score, List<Long> fids) {
+    public GotPointTopScoreRsDto getPointTopScore(Long userId, Long pointId, Long score, List<Long> fids) {
 
         List<UserPointEntity> topScore = userPointRepository.getTopScore(pointId, fids);
         Long userPosition = userPointRepository.getTopScoreUserPosition(score, pointId, fids, userId);
@@ -101,6 +101,14 @@ public class MapServiceImpl implements MapService {
                 userPosition,
                 pointId
         );
+    }
+
+    @Override
+    public void sendUserStuff(Long userId) {
+//        if (userStuffRepository.ifUserHasStuff(userId)) {
+//            userStuffRepository.creatUserStuff(userId);
+//        }
+        sendStuffToUser(userId);
     }
 
     private void updateUserPoint(Long userId, Long pointId, Long score) {
@@ -129,11 +137,16 @@ public class MapServiceImpl implements MapService {
             }
         });
 
-        var stuff = userStuffRepository.getByUserId(userId);
-        GotStuffRsDto dto = stuffMapper.entityToDto(stuff);
-        kafkaTemplate.send("topic-client", dto);
+
+        sendStuffToUser(userId);
 
         //@Todo transaction control!
         commonSender.statistic(userId, StatisticEnum.ID_OPEN_CHEST, chestId.toString());
+    }
+
+    private void sendStuffToUser(Long userId) {
+        var stuff = userStuffRepository.getByUserId(userId);
+        GotStuffRsDto dto = stuffMapper.entityToDto(stuff);
+        kafkaTemplate.send("topic-client", dto);
     }
 }

@@ -35,7 +35,7 @@ public class TopicGamePlayKafkaListener {
     @KafkaHandler
     @SendTo("topic-client")
     public GotPointTopScoreRsDto sendMePointTopScore(SendMePointTopScoreRqDto rq) {
-        return mapService.gotPointTopScore(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getFids());
+        return mapService.getPointTopScore(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getFids());
     }
 
     @KafkaHandler
@@ -45,6 +45,20 @@ public class TopicGamePlayKafkaListener {
 
     @KafkaHandler
     public void sendMeStuff(SendMeStuffRqDto rq) {
-        System.out.println(rq);
+        mapService.sendUserStuff(rq.getUserId());
+        //LogicStuff.sendStuffToUser(cntx.user.id, pStart(Profiler.ID_SAPISTUFF_SEND_ME_STUFF));
+//        let createOrSend = function (userId, prid) {
+//            DataStuff.getByUserId(userId, function (data) {
+//                if (!data) {
+//                    DataStuff.create(userId, function (data) {
+//                        CAPIStuff.gotStuff(userId, data);
+//                        pFinish(prid);
+//                    });
+//                } else {
+//                    CAPIStuff.gotStuff(userId, data);
+//                    pFinish(prid);
+//                }
+//            });
+//        };
     }
 }

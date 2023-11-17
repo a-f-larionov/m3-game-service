@@ -18,6 +18,7 @@ public interface MapService {
 
     void onFinish(Long userId, Long pointId, Long score, Long chestId);
 
-    GotPointTopScoreRsDto gotPointTopScore(Long userId, Long pointId, Long score, List<Long> fids);
+    GotPointTopScoreRsDto getPointTopScore(Long userId, Long pointId, Long score, List<Long> fids);
 
+    void sendUserStuff(Long userId);
 }

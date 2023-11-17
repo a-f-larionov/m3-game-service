@@ -3,7 +3,9 @@ package m3.gameplay.services.impl;
 import m3.gameplay.dto.ChestDto;
 import m3.gameplay.dto.PrizeDto;
 import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
+import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.gameplay.dto.rs.GotStuffRsDto;
+import m3.gameplay.dto.rs.ScoreRsDto;
 import m3.gameplay.kafka.sender.CommonSender;
 import m3.gameplay.mappers.MapMapper;
 import m3.gameplay.mappers.ScoreMapper;
@@ -83,10 +85,42 @@ class MapServiceImplTest {
     @Disabled
     void getScores() {
         // given
+        Long userId = 100L;
+        List<Long> uids = List.of(101L, 102L, 103L);
+        List<Long> pids = List.of(1101L, 1102L, 1103L);
+
+        var expectedRs = GotScoresRsDto.builder()
+                .userId(userId)
+                .rows(List.of(
+                        ScoreRsDto.builder().userId(10L).pointId(20L).score(30L).build(),
+                        ScoreRsDto.builder().userId(11L).pointId(21L).score(31L).build(),
+                        ScoreRsDto.builder().userId(12L).pointId(22L).score(32L).build()
+                ))
+                .build();
+
+        List<UserPointEntity> expectedEntitiesList = List.of(
+                createUserPointEntity(101L, 1101L, 11101),
+                createUserPointEntity(102L, 1102L, 11102),
+                createUserPointEntity(103L, 1103L, 11103)
+        );
+
+        when(userPointRepository.getScores(eq(pids), eq(uids)))
+                .thenReturn(expectedEntitiesList);
+        when(scoreMapper.toDto(eq(userId), eq(expectedEntitiesList)))
+                .thenReturn(expectedRs);
 
         // when
+        GotScoresRsDto rs = mapService.getScores(userId, pids, uids);
 
         // then
+        verify(userPointRepository).getScores(eq(pids), eq(uids));
+        verify(scoreMapper).toDto(eq(userId), eq(expectedEntitiesList));
+        assertThat(rs)
+                .isEqualTo(expectedRs);
+    }
+
+    private static UserPointEntity createUserPointEntity(Long userId, Long pointId, Integer score) {
+        return UserPointEntity.builder().id(UsersPointId.builder().userId(userId).pointId(pointId).build()).score(score).build();
     }
 
     @Test
@@ -117,7 +151,7 @@ class MapServiceImplTest {
                 .thenReturn(expectedRs);
 
         // when
-        GotPointTopScoreRsDto rs = mapService.gotPointTopScore(userId, pointId, score, fids);
+        GotPointTopScoreRsDto rs = mapService.getPointTopScore(userId, pointId, score, fids);
 
         // then
         verify(userPointRepository).getTopScore(eq(pointId), eq(fids));

@@ -96,14 +96,14 @@ class TopicGamePlayKafkaListenerTest {
                 .place3Uid(300L)
                 .build();
 
-        when(mapService.gotPointTopScore(any(), any(), any(), any()))
+        when(mapService.getPointTopScore(any(), any(), any(), any()))
                 .thenReturn(expectedRs);
 
         // when
         GotPointTopScoreRsDto rs = gameplayListener.sendMePointTopScore(rq);
 
         // then
-        verify(mapService).gotPointTopScore(eq(rq.getUserId()), eq(rq.getPointId()), eq(rq.getScore()), eq(rq.getFids()));
+        verify(mapService).getPointTopScore(eq(rq.getUserId()), eq(rq.getPointId()), eq(rq.getScore()), eq(rq.getFids()));
         assertThat(rs)
                 .isEqualTo(expectedRs);
     }
