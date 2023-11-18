@@ -1,13 +1,7 @@
 package m3.gameplay.listeners;
 
-import m3.gameplay.dto.rq.OnFinishRqDto;
-import m3.gameplay.dto.rq.SendMeMapInfoRqDto;
-import m3.gameplay.dto.rq.SendMePointTopScoreRqDto;
-import m3.gameplay.dto.rq.SendMeScoresRqDto;
-import m3.gameplay.dto.rs.GotMapInfoRsDto;
-import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
-import m3.gameplay.dto.rs.GotScoresRsDto;
-import m3.gameplay.dto.rs.ScoreRsDto;
+import m3.gameplay.dto.rq.*;
+import m3.gameplay.dto.rs.*;
 import m3.gameplay.services.MapService;
 import m3.gameplay.store.MapStore;
 import m3.gameplay.store.PointStore;
@@ -128,5 +122,26 @@ class TopicGamePlayKafkaListenerTest {
                 eq(rq.getScore()),
                 eq(rq.getChestId())
         );
+    }
+
+    @Test
+    void sendMeStuff() {
+        // given
+        Long userId = 100L;
+        SendMeStuffRqDto rq = SendMeStuffRqDto.builder()
+                .userId(userId)
+                .build();
+        var expectedRs = GotStuffRsDto.builder()
+                .userId(userId)
+                .build();
+        when(mapService.getUserStuff(any())).thenReturn(expectedRs);
+
+        // when
+        GotStuffRsDto rs = gameplayListener.sendMeStuff(rq);
+
+        // then
+        verify(mapService).getUserStuff(eq(rq.getUserId()));
+        assertThat(rs)
+                .isEqualTo(expectedRs);
     }
 }

@@ -4,6 +4,7 @@ import m3.gameplay.dto.MapDto;
 import m3.gameplay.dto.rs.GotMapInfoRsDto;
 import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
 import m3.gameplay.dto.rs.GotScoresRsDto;
+import m3.gameplay.dto.rs.GotStuffRsDto;
 
 import java.util.List;
 
@@ -20,5 +21,5 @@ public interface MapService {
 
     GotPointTopScoreRsDto getPointTopScore(Long userId, Long pointId, Long score, List<Long> fids);
 
-    void sendUserStuff(Long userId);
+    GotStuffRsDto getUserStuff(Long userId);
 }

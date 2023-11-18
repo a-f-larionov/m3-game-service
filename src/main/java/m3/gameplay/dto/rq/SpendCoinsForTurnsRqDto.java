@@ -1,9 +1,9 @@
-package m3.gameplay.dto.rs;
-
+package m3.gameplay.dto.rq;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import m3.lib.dto.rs.UserIdRsDto;
+
 
 @SuperBuilder
 @NoArgsConstructor
@@ -11,10 +11,5 @@ import m3.lib.dto.rs.UserIdRsDto;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class GotStuffRsDto extends UserIdRsDto {
-
-    private Long hummerQty;
-    private Long lightningQty;
-    private Long shuffleQty;
-    private Long goldQty;
+public class SpendCoinsForTurnsRqDto extends UserIdRsDto {
 }

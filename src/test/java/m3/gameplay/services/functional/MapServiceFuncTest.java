@@ -2,6 +2,7 @@ package m3.gameplay.services.functional;
 
 import m3.gameplay.BaseSpringBootTest;
 import m3.gameplay.dto.rs.GotScoresRsDto;
+import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.dto.rs.ScoreRsDto;
 import m3.gameplay.services.MapService;
 import org.junit.jupiter.api.Disabled;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -89,7 +91,7 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
     }
 
     private void deleteAllUsersPoints() {
-        jdbcTemplate.update("DELETE FROM users_points WHERE userId in (SELECT DISTINCT userId FROM users_points)");
+        jdbcTemplate.update("DELETE FROM users_points WHERE userId > 0");
     }
 
     @Test
@@ -113,8 +115,68 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
     void onFinishWithPrizes() {
     }
 
-
     private static ScoreRsDto createScoreRsDto(long userId, long pointId, long score) {
         return ScoreRsDto.builder().userId(userId).pointId(pointId).score(score).build();
     }
+
+    @Test
+    void getUserStuffCreateNew() {
+        // given
+        Long userId = 100L;
+        var expectedRs = GotStuffRsDto.builder()
+                .userId(userId)
+                .goldQty(500L)
+                .hummerQty(2L)
+                .shuffleQty(1L)
+                .lightningQty(1L)
+                .build();
+
+        jdbcTemplate.update("DELETE FROM users_stuff WHERE userId = ?", userId);
+
+        // when
+        GotStuffRsDto factRs = mapService.getUserStuff(userId);
+
+        // then
+        assertThat(factRs)
+                .isEqualTo(expectedRs);
+
+        Map<String, Object> dbState = jdbcTemplate.queryForMap("SELECT * FROM users_stuff WHERE userId = ?", userId);
+        assertThat(dbState.get("userId")).isEqualTo(userId);
+        assertThat(dbState.get("goldQty")).isEqualTo(500L);
+        assertThat(dbState.get("hummerQty")).isEqualTo(2L);
+        assertThat(dbState.get("shuffleQty")).isEqualTo(1L);
+        assertThat(dbState.get("lightningQty")).isEqualTo(1L);
+    }
+
+    @Test
+    void getUserStuff() {
+        // given
+        Long userId = 100L;
+        var expectedRs = GotStuffRsDto.builder()
+                .userId(userId)
+                .goldQty(0L)
+                .hummerQty(0L)
+                .shuffleQty(0L)
+                .lightningQty(0L)
+                .build();
+
+        jdbcTemplate.update("DELETE FROM users_stuff WHERE userId = ?", userId);
+        jdbcTemplate.update("INSERT INTO users_stuff (userId, hummerQty, shuffleQty, goldQty, lightningQty) " +
+                "VALUE (?, 0 ,0 ,0 ,0)", userId);
+
+        // when
+        GotStuffRsDto factRs = mapService.getUserStuff(userId);
+
+        // then
+        assertThat(factRs)
+                .isEqualTo(expectedRs);
+
+        Map<String, Object> dbState = jdbcTemplate.queryForMap("SELECT * FROM users_stuff WHERE userId = ?", userId);
+        assertThat(dbState.get("userId")).isEqualTo(userId);
+        assertThat(dbState.get("goldQty")).isEqualTo(0L);
+        assertThat(dbState.get("hummerQty")).isEqualTo(0L);
+        assertThat(dbState.get("shuffleQty")).isEqualTo(0L);
+        assertThat(dbState.get("lightningQty")).isEqualTo(0L);
+    }
+
 }

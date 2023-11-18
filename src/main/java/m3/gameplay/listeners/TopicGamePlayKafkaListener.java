@@ -6,6 +6,7 @@ import m3.gameplay.dto.rq.*;
 import m3.gameplay.dto.rs.GotMapInfoRsDto;
 import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
 import m3.gameplay.dto.rs.GotScoresRsDto;
+import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.services.MapService;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -44,21 +45,28 @@ public class TopicGamePlayKafkaListener {
     }
 
     @KafkaHandler
-    public void sendMeStuff(SendMeStuffRqDto rq) {
-        mapService.sendUserStuff(rq.getUserId());
-        //LogicStuff.sendStuffToUser(cntx.user.id, pStart(Profiler.ID_SAPISTUFF_SEND_ME_STUFF));
-//        let createOrSend = function (userId, prid) {
-//            DataStuff.getByUserId(userId, function (data) {
-//                if (!data) {
-//                    DataStuff.create(userId, function (data) {
-//                        CAPIStuff.gotStuff(userId, data);
-//                        pFinish(prid);
-//                    });
-//                } else {
-//                    CAPIStuff.gotStuff(userId, data);
-//                    pFinish(prid);
-//                }
-//            });
-//        };
+    @SendTo("topic-client")
+    public GotStuffRsDto sendMeStuff(SendMeStuffRqDto rq) {
+        return mapService.getUserStuff(rq.getUserId());
+    }
+
+    @KafkaHandler
+    @SendTo("topic-client")
+    public void spendCoinsForTurnsRqDto(SpendCoinsForTurnsRqDto rq) {
+        System.out.println(rq);
+
+
+//        Statistic.write(cntx.user.id, Statistic.ID_BUY_LOOSE_TURNS, DataShop.looseTurnsQuantity, DataShop.looseTurnsPrice);
+//
+//        DataStuff.usedGold(cntx.user.id, DataShop.looseTurnsPrice, tid);
+//
+//        Logs.log(
+//                " tid:" + tid +
+//                        " uid:" + cntx.user.id + " купил " +
+//                        DataShop.looseTurnsQuantity + " ходов за " +
+//                        DataShop.looseTurnsPrice + " монет.",
+//                Logs.LEVEL_NOTIFY,
+//                null,
+//                null, true);
     }
 }

@@ -292,4 +292,20 @@ class MapServiceImplTest {
         verify(userPointRepository).updateUserPoint(eq(userId), eq(pointId), eq(score));
         verify(userRepository).nextPointUp(eq(userId), eq(pointId + 1));
     }
+
+    @Test
+    void onFinish() {
+    }
+
+    @Test
+    void getPointTopScore() {
+    }
+
+    @Test
+    void getUserStuff() {
+    }
+
+    @Test
+    void giveChest() {
+    }
 }

@@ -16,6 +16,7 @@ import m3.gameplay.services.PointsService;
 import m3.gameplay.services.StuffService;
 import m3.gameplay.store.MapStore;
 import m3.lib.entities.UserPointEntity;
+import m3.lib.entities.UserStuffEntity;
 import m3.lib.enums.StatisticEnum;
 import m3.lib.repositories.UserPointRepository;
 import m3.lib.repositories.UserRepository;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -95,20 +97,22 @@ public class MapServiceImpl implements MapService {
 
         return scoreMapper.toDto(
                 userId,
-                topScore.get(0).getId().getUserId(),
-                topScore.get(1).getId().getUserId(),
-                topScore.get(2).getId().getUserId(),
+                topScore.get(0) != null ? topScore.get(0).getId().getUserId() : null,
+                topScore.get(1) != null ? topScore.get(1).getId().getUserId() : null,
+                topScore.get(2) != null ? topScore.get(2).getId().getUserId() : null,
                 userPosition,
                 pointId
         );
     }
 
     @Override
-    public void sendUserStuff(Long userId) {
-//        if (userStuffRepository.ifUserHasStuff(userId)) {
-//            userStuffRepository.creatUserStuff(userId);
-//        }
-        sendStuffToUser(userId);
+    public GotStuffRsDto getUserStuff(Long userId) {
+        Optional<UserStuffEntity> userStuff = userStuffRepository.findById(userId);
+        if (userStuff.isEmpty()) {
+            userStuffRepository.creatUserStuff(userId);
+            userStuff = userStuffRepository.findById(userId);
+        }
+        return stuffMapper.entityToDto(userStuff.get());
     }
 
     private void updateUserPoint(Long userId, Long pointId, Long score) {
@@ -137,7 +141,6 @@ public class MapServiceImpl implements MapService {
             }
         });
 
-
         sendStuffToUser(userId);
 
         //@Todo transaction control!
@@ -146,7 +149,7 @@ public class MapServiceImpl implements MapService {
 
     private void sendStuffToUser(Long userId) {
         var stuff = userStuffRepository.getByUserId(userId);
-        GotStuffRsDto dto = stuffMapper.entityToDto(stuff);
-        kafkaTemplate.send("topic-client", dto);
+        GotStuffRsDto stuffRsDto = stuffMapper.entityToDto(stuff);
+        kafkaTemplate.send("topic-client", stuffRsDto);
     }
 }
