@@ -5,7 +5,7 @@ import m3.gameplay.dto.PrizeDto;
 
 import java.util.List;
 
-import static m3.gameplay.enums.DataObjects.*;
+import static m3.lib.enums.ObjectEnum.*;
 
 public class ChestsStore {
 

@@ -1,16 +1,19 @@
 package m3.gameplay.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import m3.gameplay.services.StuffService;
 import m3.lib.repositories.UserStuffRepository;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class StuffServiceImpl implements StuffService {
 
     private final UserStuffRepository userStuffRepository;
 
-    public StuffServiceImpl(UserStuffRepository userStuffRepository) {
-        this.userStuffRepository = userStuffRepository;
+    @Override
+    public void giveAGold(Long userId, Long qty) {
+        userStuffRepository.incrementGoldQty(userId, qty);
     }
 
     @Override
@@ -29,7 +32,22 @@ public class StuffServiceImpl implements StuffService {
     }
 
     @Override
-    public void giveAGold(Long userId, Long qty) {
-        userStuffRepository.incrementGoldQty(userId, qty);
+    public void spendAHummer(Long userId, Long qty) {
+        userStuffRepository.decrementHummerQty(userId, qty);
+    }
+
+    @Override
+    public void spendALightning(Long userId, Long qty) {
+        userStuffRepository.decrementLightningQty(userId, qty);
+    }
+
+    @Override
+    public void spendAShuffle(Long userId, Long qty) {
+        userStuffRepository.decrementShuffleQty(userId, qty);
+    }
+
+    @Override
+    public void spendAGold(Long userId, Long qty) {
+        userStuffRepository.decrementGoldQty(userId, qty);
     }
 }

@@ -31,7 +31,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import java.util.List;
 import java.util.Optional;
 
-import static m3.gameplay.enums.DataObjects.*;
+import static m3.lib.enums.ObjectEnum.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -49,40 +49,11 @@ class MapServiceImplTest {
     private final CommonSender commonSender = mock(CommonSender.class);
     private final KafkaTemplate<String, Object> kafkaTemplate = mock(KafkaTemplate.class);
 
-    private final MapService mapService = new MapServiceImpl(pointsService, chestsService, stuffService, mapMapper, stuffMapper, scoreMapper, userRepository, userPointRepository, userStuffRepository, commonSender, kafkaTemplate);
+    private final MapService mapService = new MapServiceImpl(
+
+            pointsService, chestsService, stuffService, mapMapper, stuffMapper, scoreMapper, userRepository, userPointRepository, userStuffRepository, commonSender, kafkaTemplate);
 
     @Test
-    @Disabled
-    void existsMap() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @Disabled
-    void getById() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @Disabled
-    void getMapInfo() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @Disabled
     void getScores() {
         // given
         Long userId = 100L;
@@ -117,10 +88,6 @@ class MapServiceImplTest {
         verify(scoreMapper).toDto(eq(userId), eq(expectedEntitiesList));
         assertThat(rs)
                 .isEqualTo(expectedRs);
-    }
-
-    private static UserPointEntity createUserPointEntity(Long userId, Long pointId, Integer score) {
-        return UserPointEntity.builder().id(UsersPointId.builder().userId(userId).pointId(pointId).build()).score(score).build();
     }
 
     @Test
@@ -176,15 +143,13 @@ class MapServiceImplTest {
         Long userId = 10L;
         Long pointId = 20L;
         Long score = 30L;
-        Long chestId = 0L; // zere - means no chest to open
+        Long chestId = 0L; // zero - means no chest to open
 
         when(userRepository.findById(any()))
                 .thenReturn(Optional.empty());
 
         // when
-        ThrowableAssert.ThrowingCallable callable = () -> {
-            mapService.onFinish(userId, pointId, score, chestId);
-        };
+        ThrowableAssert.ThrowingCallable callable = () -> mapService.onFinish(userId, pointId, score, chestId);
 
         // then
         Assertions.assertThatCode(callable)
@@ -199,7 +164,7 @@ class MapServiceImplTest {
         Long userId = 10L;
         Long pointId = 20L;
         Long score = 30L;
-        Long chestId = 0L; // zere - means no chest to open
+        Long chestId = 0L; // zero - means no chest to open
 
         when(userRepository.findById(any()))
                 .thenReturn(Optional.of(UserEntity.builder()
@@ -233,19 +198,8 @@ class MapServiceImplTest {
         Long score = 30L;
         Long chestId = 1L;
 
-        var expectedStuffDto = GotStuffRsDto.builder()
-                .goldQty(1000L)
-                .hummerQty(2000L)
-                .lightningQty(3000L)
-                .shuffleQty(4000L)
-                .build();
-        var expectedStuffEntity = UserStuffEntity.builder()
-                .id(1L)
-                .goldQty(1001L)
-                .hummerQty(1002L)
-                .lightningQty(10003L)
-                .shuffleQty(10004L)
-                .build();
+        var expectedStuffDto = buildGotStuffRsDto(userId);
+        var expectedStuffEntity = buildUserStuffEntity(userId);
 
         when(userRepository.findById(any()))
                 .thenReturn(Optional.of(UserEntity.builder()
@@ -294,18 +248,96 @@ class MapServiceImplTest {
     }
 
     @Test
+    void spendCoinsForTurns() {
+        // given
+        Long userId = 100L;
+        var expectedRs = buildGotStuffRsDto(userId);
+        var userEntity = buildUserStuffEntity(userId);
+        when(userStuffRepository.findById(any())).thenReturn(Optional.of(userEntity));
+        when(stuffMapper.entityToDto(any())).thenReturn(expectedRs);
+
+        // when
+        GotStuffRsDto actualRs = mapService.spendCoinsForTurns(userId);
+
+        // then
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        verify(userStuffRepository).findById(userId);
+        verify(stuffMapper).entityToDto(userEntity);
+        verify(commonSender).statistic(eq(userId), eq(StatisticEnum.ID_BUY_TURNS));
+    }
+
+    @Test
+    @Disabled
     void onFinish() {
     }
 
     @Test
+    @Disabled
     void getPointTopScore() {
     }
 
     @Test
+    @Disabled
     void getUserStuff() {
     }
 
     @Test
+    @Disabled
     void giveChest() {
+    }
+
+    @Test
+    @Disabled
+    void existsMap() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @Disabled
+    void getById() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @Disabled
+    void getMapInfo() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    private static GotStuffRsDto buildGotStuffRsDto(Long userId) {
+        return GotStuffRsDto.builder()
+                .userId(userId)
+                .goldQty(100L)
+                .hummerQty(1L)
+                .lightningQty(1L)
+                .shuffleQty(1L)
+                .build();
+    }
+
+    private UserStuffEntity buildUserStuffEntity(Long userId) {
+        return UserStuffEntity.builder()
+                .id(userId)
+                .goldQty(1001L)
+                .hummerQty(1002L)
+                .lightningQty(10003L)
+                .shuffleQty(10004L)
+                .build();
+    }
+
+    private static UserPointEntity createUserPointEntity(Long userId, Long pointId, Integer score) {
+        return UserPointEntity.builder().id(UsersPointId.builder().userId(userId).pointId(pointId).build()).score(score).build();
     }
 }

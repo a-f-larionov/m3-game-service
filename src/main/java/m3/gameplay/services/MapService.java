@@ -5,6 +5,7 @@ import m3.gameplay.dto.rs.GotMapInfoRsDto;
 import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
 import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.gameplay.dto.rs.GotStuffRsDto;
+import m3.lib.enums.ObjectEnum;
 
 import java.util.List;
 
@@ -21,5 +22,14 @@ public interface MapService {
 
     GotPointTopScoreRsDto getPointTopScore(Long userId, Long pointId, Long score, List<Long> fids);
 
-    GotStuffRsDto getUserStuff(Long userId);
+    GotStuffRsDto getUserStuffRsDto(Long userId);
+
+    GotStuffRsDto spendCoinsForTurns(Long userId);
+
+    GotStuffRsDto buyHealth(Long userId, Long index);
+
+    GotStuffRsDto buyProduct(Long userId, Long index, ObjectEnum objectId);
+
+    GotStuffRsDto spendProduct(Long userId, ObjectEnum objectId);
+
 }

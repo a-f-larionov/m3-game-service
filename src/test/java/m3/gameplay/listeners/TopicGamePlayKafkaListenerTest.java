@@ -5,6 +5,7 @@ import m3.gameplay.dto.rs.*;
 import m3.gameplay.services.MapService;
 import m3.gameplay.store.MapStore;
 import m3.gameplay.store.PointStore;
+import m3.lib.enums.ObjectEnum;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -131,17 +132,189 @@ class TopicGamePlayKafkaListenerTest {
         SendMeStuffRqDto rq = SendMeStuffRqDto.builder()
                 .userId(userId)
                 .build();
-        var expectedRs = GotStuffRsDto.builder()
-                .userId(userId)
-                .build();
-        when(mapService.getUserStuff(any())).thenReturn(expectedRs);
+        var expectedRs = buildGotStuffRsDto(userId);
+        when(mapService.getUserStuffRsDto(any())).thenReturn(expectedRs);
 
         // when
         GotStuffRsDto rs = gameplayListener.sendMeStuff(rq);
 
         // then
-        verify(mapService).getUserStuff(eq(rq.getUserId()));
+        verify(mapService).getUserStuffRsDto(eq(rq.getUserId()));
         assertThat(rs)
                 .isEqualTo(expectedRs);
+    }
+
+    @Test
+    void spendCoinsForTurnsRqDto() {
+        // given
+        var userId = 100L;
+        SpendCoinsForTurnsRqDto rq = SpendCoinsForTurnsRqDto.builder()
+                .userId(userId)
+                .build();
+        GotStuffRsDto expectedRsDto = buildGotStuffRsDto(userId);
+        when(mapService.spendCoinsForTurns(any())).thenReturn(expectedRsDto);
+
+        // when
+        GotStuffRsDto actualRs = gameplayListener.spendCoinsForTurnsRqDto(rq);
+
+        // then
+        assertThat(actualRs).isEqualTo(expectedRsDto);
+        verify(mapService).spendCoinsForTurns(eq(rq.getUserId()));
+    }
+
+    @Test
+    void buyHealth() {
+        // given
+        var userId = 100L;
+        var index = 200L;
+        var rq = BuyHealthRqDto.builder().userId(userId).index(index).build();
+        var expectedRs = buildGotStuffRsDto(userId);
+        when(mapService.buyHealth(any(), any())).thenReturn(expectedRs);
+
+        // when
+        var actualRs = gameplayListener.buyHealth(rq);
+
+        // then
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        verify(mapService)
+                .buyHealth(userId, index);
+    }
+
+    @Test
+    void buyHummer() {
+        // given1
+        var userId = 100L;
+        var index = 200L;
+        var rq = buildBuyHummerRqDto(userId, index);
+        var expectedRs = buildGotStuffRsDto(userId);
+        when(mapService.buyProduct(any(), any(), any())).thenReturn(expectedRs);
+
+        // when
+        var actualRs = gameplayListener.buyHummer(rq);
+
+        // then
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        verify(mapService)
+                .buyProduct(userId, index, ObjectEnum.STUFF_HUMMER);
+    }
+
+    @Test
+    void buyLightning() {
+        // given1
+        var userId = 100L;
+        var index = 200L;
+        var rq = buildBuyLightningRqDto(userId, index);
+        var expectedRs = buildGotStuffRsDto(userId);
+        when(mapService.buyProduct(any(), any(), any())).thenReturn(expectedRs);
+
+        // when
+        var actualRs = gameplayListener.buyLightning(rq);
+
+        // then
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        verify(mapService)
+                .buyProduct(userId, index, ObjectEnum.STUFF_LIGHTNING);
+    }
+
+    @Test
+    void buyShuffle() {
+        // given1
+        var userId = 100L;
+        var index = 200L;
+        var rq = buildBuyShuffleRqDto(userId, index);
+        var expectedRs = buildGotStuffRsDto(userId);
+        when(mapService.buyProduct(any(), any(), any())).thenReturn(expectedRs);
+
+        // when
+        var actualRs = gameplayListener.buyShuffle(rq);
+
+        // then
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        verify(mapService)
+                .buyProduct(userId, index, ObjectEnum.STUFF_SHUFFLE);
+    }
+
+    @Test
+    void usedHummer() {
+        // given
+        var userId = 100L;
+        var rq = UsedHummerRqDto.builder().userId(userId).build();
+        var expectedRs = buildGotStuffRsDto(userId);
+        when(mapService.spendProduct(any(),any())).thenReturn(expectedRs);
+
+        // when
+        var actualRs = gameplayListener.usedHummer(rq);
+
+        // then
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        verify(mapService)
+                .spendProduct(userId, ObjectEnum.STUFF_HUMMER);
+    }
+
+    @Test
+    void usedLightning() {
+        // given
+        var userId = 100L;
+        var rq = UsedLightningRqDto.builder().userId(userId).build();
+        var expectedRs = buildGotStuffRsDto(userId);
+        when(mapService.spendProduct(any(),any())).thenReturn(expectedRs);
+
+        // when
+        var actualRs = gameplayListener.usedLightning(rq);
+
+        // then
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        verify(mapService)
+                .spendProduct(userId, ObjectEnum.STUFF_LIGHTNING);
+    }
+
+    @Test
+    void usedShuffle() {
+        // given
+        var userId = 100L;
+        var rq = UsedShuffleRqDto.builder().userId(userId).build();
+        var expectedRs = buildGotStuffRsDto(userId);
+        when(mapService.spendProduct(any(),any())).thenReturn(expectedRs);
+
+        // when
+        var actualRs = gameplayListener.usedShuffle(rq);
+
+        // then
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        verify(mapService)
+                .spendProduct(userId, ObjectEnum.STUFF_SHUFFLE);
+    }
+
+    private static GotStuffRsDto buildGotStuffRsDto(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
+        return GotStuffRsDto.builder()
+                .userId(userId)
+                .goldQty(gold)
+                .hummerQty(hummer)
+                .shuffleQty(shuffle)
+                .lightningQty(lightning)
+                .build();
+    }
+
+    private static GotStuffRsDto buildGotStuffRsDto(long userId) {
+        return buildGotStuffRsDto(userId, 100L, 1L, 1L, 1L);
+    }
+
+    private static BuyHummerRqDto buildBuyHummerRqDto(long userId, long index) {
+        return BuyHummerRqDto.builder().userId(userId).index(index).build();
+    }
+
+    private static BuyLightningRqDto buildBuyLightningRqDto(long userId, long index) {
+        return BuyLightningRqDto.builder().userId(userId).index(index).build();
+    }
+
+    private static BuyShuffleRqDto buildBuyShuffleRqDto(long userId, long index) {
+        return BuyShuffleRqDto.builder().userId(userId).index(index).build();
     }
 }

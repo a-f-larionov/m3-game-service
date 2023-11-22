@@ -8,6 +8,7 @@ import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
 import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.services.MapService;
+import m3.lib.enums.ObjectEnum;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -47,26 +48,54 @@ public class TopicGamePlayKafkaListener {
     @KafkaHandler
     @SendTo("topic-client")
     public GotStuffRsDto sendMeStuff(SendMeStuffRqDto rq) {
-        return mapService.getUserStuff(rq.getUserId());
+        return mapService.getUserStuffRsDto(rq.getUserId());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public void spendCoinsForTurnsRqDto(SpendCoinsForTurnsRqDto rq) {
-        System.out.println(rq);
+    public GotStuffRsDto spendCoinsForTurnsRqDto(SpendCoinsForTurnsRqDto rq) {
+        return mapService.spendCoinsForTurns(rq.getUserId());
+    }
 
+    @KafkaHandler
+    @SendTo("topic-client")
+    public GotStuffRsDto buyHealth(BuyHealthRqDto rq) {
+        return mapService.buyHealth(rq.getUserId(), rq.getIndex());
+    }
 
-//        Statistic.write(cntx.user.id, Statistic.ID_BUY_LOOSE_TURNS, DataShop.looseTurnsQuantity, DataShop.looseTurnsPrice);
-//
-//        DataStuff.usedGold(cntx.user.id, DataShop.looseTurnsPrice, tid);
-//
-//        Logs.log(
-//                " tid:" + tid +
-//                        " uid:" + cntx.user.id + " купил " +
-//                        DataShop.looseTurnsQuantity + " ходов за " +
-//                        DataShop.looseTurnsPrice + " монет.",
-//                Logs.LEVEL_NOTIFY,
-//                null,
-//                null, true);
+    @KafkaHandler
+    @SendTo("topic-client")
+    public GotStuffRsDto buyHummer(BuyHummerRqDto rq) {
+        return mapService.buyProduct(rq.getUserId(), rq.getIndex(), ObjectEnum.STUFF_HUMMER);
+    }
+    
+    @KafkaHandler
+    @SendTo("topic-client")
+    public GotStuffRsDto buyLightning(BuyLightningRqDto rq) {
+        return mapService.buyProduct(rq.getUserId(), rq.getIndex(), ObjectEnum.STUFF_LIGHTNING);
+    }
+
+    @KafkaHandler
+    @SendTo("topic-client")
+    public GotStuffRsDto buyShuffle(BuyShuffleRqDto rq) {
+        return mapService.buyProduct(rq.getUserId(), rq.getIndex(), ObjectEnum.STUFF_SHUFFLE);
+    }
+
+    @KafkaHandler
+    @SendTo("topic-client")
+    public GotStuffRsDto usedHummer(UsedHummerRqDto rq) {
+        return mapService.spendProduct(rq.getUserId(), ObjectEnum.STUFF_HUMMER);
+    }
+
+    @KafkaHandler
+    @SendTo("topic-client")
+    public GotStuffRsDto usedLightning(UsedLightningRqDto rq) {
+        return mapService.spendProduct(rq.getUserId(), ObjectEnum.STUFF_LIGHTNING);
+    }
+
+    @KafkaHandler
+    @SendTo("topic-client")
+    public GotStuffRsDto usedShuffle(UsedShuffleRqDto rq) {
+        return mapService.spendProduct(rq.getUserId(), ObjectEnum.STUFF_SHUFFLE);
     }
 }

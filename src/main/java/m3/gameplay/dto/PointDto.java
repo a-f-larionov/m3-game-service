@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import m3.gameplay.enums.DataObjects;
+import m3.lib.enums.ObjectEnum;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +16,7 @@ public class PointDto {
     public PointDto(@NonNull Long id,
                     @NonNull Long turns,
                     @NonNull Long score1, @NonNull Long score2, @NonNull Long score3,
-                    @NonNull Map<DataObjects, Integer> goals,
+                    @NonNull Map<ObjectEnum, Integer> goals,
                     @NonNull List<String> mask,
                     @NonNull List<String> gems,
                     @NonNull List<List<String>> special) {

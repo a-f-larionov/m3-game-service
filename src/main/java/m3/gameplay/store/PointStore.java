@@ -1,17 +1,18 @@
 package m3.gameplay.store;
 
 import m3.gameplay.dto.PointDto;
-import m3.gameplay.enums.DataObjects;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static m3.lib.enums.ObjectEnum.*;
+
 public class PointStore {
     public static final List<PointDto> points = List.of(
 
             new PointDto(1L, 10L, 100L, 200L, 300L,
-                    Map.of(DataObjects.OBJECT_RED, 9),
+                    Map.of(OBJECT_RED, 9),
                     List.of("     ",
                             "     ",
                             "     ",
@@ -32,7 +33,7 @@ public class PointStore {
             ),
             /* WizardLevel_2 lightning */
             new PointDto(2L, 15L, 100L, 200L, 300L,
-                    Map.of(DataObjects.OBJECT_PURPLE, 12),
+                    Map.of(OBJECT_PURPLE, 12),
                     List.of(
                             "        ",
                             "        ",
@@ -56,7 +57,7 @@ public class PointStore {
                             "GPYPGYPG",
                             "BYPGPPBB"), Collections.emptyList()),
             /* WizardLevel_3 polycolor gem */
-            new PointDto(3L, 8L, 100L, 200L, 600L, Map.of(DataObjects.OBJECT_GREEN, 12),
+            new PointDto(3L, 8L, 100L, 200L, 600L, Map.of(OBJECT_GREEN, 12),
                     List.of(
                             "         ",
                             "         ",
@@ -81,7 +82,7 @@ public class PointStore {
                     "RBYYGYPBB"), Collections.emptyList()),
             /* WizardLevel_4 gold*/
             new PointDto(4L, 18L, 600L, 1500L, 2000L,
-                    Map.of(DataObjects.OBJECT_GOLD, 4),
+                    Map.of(OBJECT_GOLD, 4),
                     List.of(
                             "",
                             "",
@@ -117,7 +118,7 @@ public class PointStore {
                             "      "))),
 
             new PointDto(5L, 24L, 1000L, 1500L, 8000L,
-                    Map.of(DataObjects.OBJECT_GOLD, 17 - 4),
+                    Map.of(OBJECT_GOLD, 17 - 4),
                     List.of(
                             "□□□□□□□",
                             "□□□□□□□",
@@ -135,7 +136,7 @@ public class PointStore {
                     " $ $ $ ",
                     "       "))),
             new PointDto(6L, 21L, 600L, 1000L, 2000L,
-                    Map.of(DataObjects.OBJECT_GOLD, 6),
+                    Map.of(OBJECT_GOLD, 6),
                     List.of(
                             "□□□□□□",
                             "□□□□□□",
@@ -154,8 +155,8 @@ public class PointStore {
                             " $  $ ",
                             "      "))),
             new PointDto(7L, 28L, 100L, 3000L, 5000L,
-                    Map.of(DataObjects.OBJECT_GOLD, 9,
-                            DataObjects.OBJECT_RED, 33),
+                    Map.of(OBJECT_GOLD, 9,
+                            OBJECT_RED, 33),
                     List.of(
                             "□□□□□□□",
                             "□□□□□□□",
@@ -177,9 +178,9 @@ public class PointStore {
                             "        "))),
 
             new PointDto(8L, 24L, 100L, 1000L, 5000L,
-                    Map.of(DataObjects.OBJECT_GOLD, 12,
-                            DataObjects.OBJECT_RED, 10,
-                            DataObjects.OBJECT_GREEN, 10),
+                    Map.of(OBJECT_GOLD, 12,
+                            OBJECT_RED, 10,
+                            OBJECT_GREEN, 10),
                     List.of(
                             "  □□□□  ",
                             " □□□□□□ ",
@@ -198,7 +199,7 @@ public class PointStore {
                     "       "))),
             /* WizardLevel9_1 Взорви камни рядом с ящиком.*/
             new PointDto(9L, 25L, 1000L, 2000L, 3500L,
-                    Map.of(DataObjects.OBJECT_GOLD, 8),
+                    Map.of(OBJECT_GOLD, 8),
                     List.of(
                             "",
                             "",
@@ -244,8 +245,8 @@ public class PointStore {
                                     "",
                                     ""))),
             new PointDto(10L, 20L, 1000L, 2000L, 2500L,
-                    Map.of(DataObjects.OBJECT_GOLD, 4,
-                            DataObjects.OBJECT_RED, 9),
+                    Map.of(OBJECT_GOLD, 4,
+                            OBJECT_RED, 9),
                     List.of(
                             "□     □ ",
                             "□     □ ",
@@ -273,9 +274,9 @@ public class PointStore {
                             ""
                     ))),
             new PointDto(11L, 45L, 500L, 1500L, 2000L,
-                    Map.of(DataObjects.OBJECT_BLUE, 40,
-                            DataObjects.OBJECT_RED, 40,
-                            DataObjects.OBJECT_YELLOW, 40),
+                    Map.of(OBJECT_BLUE, 40,
+                            OBJECT_RED, 40,
+                            OBJECT_YELLOW, 40),
                     List.of(
                             "        ",
                             "        ",
@@ -299,7 +300,7 @@ public class PointStore {
                     ""))),
             /* WizardLevel_12 Собирай пауков, взрывая камни на которых они сидят. */
             new PointDto(12L, 15L, 100L, 500L, 800L,
-                    Map.of(DataObjects.OBJECT_BETA, 4),
+                    Map.of(OBJECT_BETA, 4),
                     List.of(
                             "",
                             "",
@@ -328,7 +329,7 @@ public class PointStore {
                             ""
                     ))),
             new PointDto(13L, 15L, 100L, 1000L, 1500L,
-                    Map.of(DataObjects.OBJECT_BETA, 8),
+                    Map.of(OBJECT_BETA, 8),
                     List.of(
                             "□ □ □ □",
                             "□□□□□□□",
@@ -346,8 +347,8 @@ public class PointStore {
                     "",
                     "β β β β"))),
             new PointDto(14L, 15L, 500L, 1000L, 1500L,
-                    Map.of(DataObjects.OBJECT_BETA, 8,
-                            DataObjects.OBJECT_GOLD, 8),
+                    Map.of(OBJECT_BETA, 8,
+                            OBJECT_GOLD, 8),
                     List.of(
                             "",
                             "",
@@ -391,9 +392,9 @@ public class PointStore {
 
             /* WizardLevel_15 Собери кристаллы, чтобы снять цепь.*/
             new PointDto(15L, 30L, 1000L, 2000L, 35000L,
-                    Map.of(DataObjects.OBJECT_BETA, 5,
-                            DataObjects.OBJECT_RED, 12,
-                            DataObjects.OBJECT_GREEN, 12),
+                    Map.of(OBJECT_BETA, 5,
+                            OBJECT_RED, 12,
+                            OBJECT_GREEN, 12),
                     List.of(
                             "  □ □ □ ",
                             "□ □□□□□ □",
@@ -429,8 +430,8 @@ public class PointStore {
                             "  ╱╲ ╱╲",
                             ""))),
             new PointDto(16L, 15L, 500L, 1000L, 3500L,
-                    Map.of(DataObjects.OBJECT_GOLD, 4,
-                            DataObjects.OBJECT_BETA, 4),
+                    Map.of(OBJECT_GOLD, 4,
+                            OBJECT_BETA, 4),
                     List.of(
                             " □□□□□□ ",
                             "□□□□□□□□",
@@ -447,9 +448,9 @@ public class PointStore {
                     "       ",
                     "       "))),
             new PointDto(17L, 35L, 500L, 2500L, 5500L,
-                    Map.of(DataObjects.OBJECT_GOLD, 4,
-                            DataObjects.OBJECT_BETA, 4,
-                            DataObjects.OBJECT_BOX, 3),
+                    Map.of(OBJECT_GOLD, 4,
+                            OBJECT_BETA, 4,
+                            OBJECT_BOX, 3),
                     List.of(
                             "  □□□□□  ",
                             "□□□□□□□□□",
@@ -475,8 +476,8 @@ public class PointStore {
                     "        "))),
             new PointDto(18L, 15L, 500L, 1000L, 4000L,
                     Map.of(
-                            DataObjects.OBJECT_GOLD, 8,
-                            DataObjects.OBJECT_BOX, 8),
+                            OBJECT_GOLD, 8,
+                            OBJECT_BOX, 8),
                     List.of(
                             "",
                             "",
@@ -518,7 +519,7 @@ public class PointStore {
                             "       "
                     ))),
             new PointDto(19L, 40L, 7000L, 7500L, 8000L,
-                    Map.of(DataObjects.OBJECT_GOLD, 20),
+                    Map.of(OBJECT_GOLD, 20),
                     List.of(
                             "□□□□□□□",
                             " □□□□□ ",
@@ -555,7 +556,7 @@ public class PointStore {
                     " X   X ",
                     "       "))),
             new PointDto(20L, 15L, 200L, 400L, 700L,
-                    Map.of(DataObjects.OBJECT_BETA, 5),
+                    Map.of(OBJECT_BETA, 5),
                     List.of(
                             "",
                             "",
@@ -587,8 +588,8 @@ public class PointStore {
                     "",
                     ""))),
             new PointDto(21L, 35L, 500L, 1000L, 2000L,
-                    Map.of(DataObjects.OBJECT_BETA, 5,
-                            DataObjects.OBJECT_GOLD, 8),
+                    Map.of(OBJECT_BETA, 5,
+                            OBJECT_GOLD, 8),
                     List.of(
                             "□□□□□□□",
                             "□□□□□□□",
@@ -622,8 +623,8 @@ public class PointStore {
                     " ╱   ╲  ",
                     "        "))),
             new PointDto(22L, 25L, 500L, 1000L, 1500L,
-                    Map.of(DataObjects.OBJECT_BETA, 7,
-                            DataObjects.OBJECT_BOX, 15),
+                    Map.of(OBJECT_BETA, 7,
+                            OBJECT_BOX, 15),
                     List.of(
                             " □□ □□",
                             "□□□□□□□",
@@ -657,7 +658,7 @@ public class PointStore {
                     "       ",
                     "       "))),
             new PointDto(23L, 15L, 500L, 1000L, 1500L,
-                    Map.of(DataObjects.OBJECT_ALPHA, 4),
+                    Map.of(OBJECT_ALPHA, 4),
                     List.of(
                             " □□□□□□□",
                             "□□□□□□□□□",
@@ -681,7 +682,7 @@ public class PointStore {
                     "         "
             ))),
             new PointDto(24L, 20L, 500L, 1200L, 2500L,
-                    Map.of(DataObjects.OBJECT_RED, 20),
+                    Map.of(OBJECT_RED, 20),
                     List.of(
                             "□□□□ □□□□",
                             "□□□□ □□□□",
@@ -690,9 +691,9 @@ public class PointStore {
                             "□□□□ □□□□",
                             "□□□□ □□□□"), Collections.emptyList(), Collections.emptyList()),
             new PointDto(25L, 35L, 500L, 1500L, 5000L,
-                    Map.of(DataObjects.OBJECT_YELLOW, 20,
-                            DataObjects.OBJECT_PURPLE, 20,
-                            DataObjects.OBJECT_BETA, 18),
+                    Map.of(OBJECT_YELLOW, 20,
+                            OBJECT_PURPLE, 20,
+                            OBJECT_BETA, 18),
                     List.of(
                             "□□□   □□□",
                             "□□□   □□□",
@@ -718,8 +719,8 @@ public class PointStore {
                     "",
                     ""))),
             new PointDto(26L, 30L, 500L, 5500L, 6000L,
-                    Map.of(DataObjects.OBJECT_BETA, 20,
-                            DataObjects.OBJECT_ALPHA, 7),
+                    Map.of(OBJECT_BETA, 20,
+                            OBJECT_ALPHA, 7),
                     List.of(
                             "□□□□□□□□□",
                             "□□□□□□□□□",
@@ -752,7 +753,7 @@ public class PointStore {
                     "         ",
                     "          "))),
             new PointDto(27L, 8L, 500L, 1200L, 1800L,
-                    Map.of(DataObjects.OBJECT_BOX, 12),
+                    Map.of(OBJECT_BOX, 12),
                     List.of(
                             "  □□□□",
                             " □□□□□",
@@ -769,7 +770,7 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(28L, 18L, 500L, 1800L, 2200L,
-                    Map.of(DataObjects.OBJECT_BOX, 10),
+                    Map.of(OBJECT_BOX, 10),
                     List.of(
                             "  □□□□□ ",
                             "□□□□□□□□□",
@@ -788,7 +789,7 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(29L, 15L, 500L, 2500L, 5500L,
-                    Map.of(DataObjects.OBJECT_BOX, 20),
+                    Map.of(OBJECT_BOX, 20),
                     List.of(
                             "□□ □□ □□",
                             "□□□□□□□□",
@@ -806,7 +807,7 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(30L, 10L, 100L, 200L, 400L,
-                    Map.of(DataObjects.OBJECT_BARREL, 2),//WIZARD
+                    Map.of(OBJECT_BARREL, 2),//WIZARD
                     List.of(
                             "□□□□□□□□",
                             "□□□□□□□□",
@@ -831,9 +832,9 @@ public class PointStore {
                     //"* ╱ ╲ ■ □ ᥩ α β γ ",
             ))),
             new PointDto(31L, 35L, 500L, 1500L, 5000L,
-                    Map.of(DataObjects.OBJECT_YELLOW, 30,
-                            DataObjects.OBJECT_PURPLE, 30,
-                            DataObjects.OBJECT_BETA, 30),
+                    Map.of(OBJECT_YELLOW, 30,
+                            OBJECT_PURPLE, 30,
+                            OBJECT_BETA, 30),
                     List.of(
                             "□□□   □□□",
                             "□□□   □□□",
@@ -859,7 +860,7 @@ public class PointStore {
                     "",
                     ""))),
             new PointDto(32L, 30L, 500L, 2500L, 5500L,
-                    Map.of(DataObjects.OBJECT_BARREL, 2),
+                    Map.of(OBJECT_BARREL, 2),
                     List.of(
                             "□□□□□□□□□",
                             "□□ □□□□□□",
@@ -879,8 +880,8 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(33L, 35L, 500L, 8500L, 9000L,
-                    Map.of(DataObjects.OBJECT_BETA, 9,
-                            DataObjects.OBJECT_GOLD, 15),
+                    Map.of(OBJECT_BETA, 9,
+                            OBJECT_GOLD, 15),
                     List.of(
                             "        □",
                             "       □□",
@@ -914,8 +915,8 @@ public class PointStore {
                     "    $$$$$"))),
 
             new PointDto(34L, (28L - 12L), 500L, 2500L, 2700L,
-                    Map.of(DataObjects.OBJECT_BETA, 10,
-                            DataObjects.OBJECT_ALPHA, 4),
+                    Map.of(OBJECT_BETA, 10,
+                            OBJECT_ALPHA, 4),
                     List.of(
                             " □□□□□□□ ",
                             "□□□□□□□□□",
@@ -933,8 +934,8 @@ public class PointStore {
                     //"* ╱ ╲ ■ □ ᥩ α β γ ",
             ))),
             new PointDto(35L, 30L, 1000L, 1500L, 2700L,
-                    Map.of(DataObjects.OBJECT_BARREL, 4,
-                            DataObjects.OBJECT_ALPHA, 6),
+                    Map.of(OBJECT_BARREL, 4,
+                            OBJECT_ALPHA, 6),
                     List.of(
                             " □□□□□□□ ",
                             "□□□□ □□□□",
@@ -956,7 +957,7 @@ public class PointStore {
             ))),
 
             new PointDto(36L, 24L - 8L, 500L, 1500L, 2500L,
-                    Map.of(DataObjects.OBJECT_BARREL, 2),
+                    Map.of(OBJECT_BARREL, 2),
                     List.of(
                             "  □   □  ",
                             "□□□□□□□□□",
@@ -978,8 +979,8 @@ public class PointStore {
                     //"* ╱ ╲ ■ □ ᥩ α β γ ",
             ))),
             new PointDto(37L, 21L, 500L, 1000L, 1500L,
-                    Map.of(DataObjects.OBJECT_ALPHA, 2,
-                            DataObjects.OBJECT_BARREL, 4),
+                    Map.of(OBJECT_ALPHA, 2,
+                            OBJECT_BARREL, 4),
                     List.of(
                             "  □   □  ",
                             "  □□□□□  ",
@@ -999,7 +1000,7 @@ public class PointStore {
                     //"* ╱ ╲ ■ □ ᥩ α β γ ",
             ))),
             new PointDto(38L, 40L, 500L, 2500L, 5500L,
-                    Map.of(DataObjects.OBJECT_BOX, 34),
+                    Map.of(OBJECT_BOX, 34),
                     List.of(
                             " □□□□□□□ ",
                             "□□□□□□□□□",
@@ -1019,7 +1020,7 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(39L, 30L, 500L, 2500L, 5500L,
-                    Map.of(DataObjects.OBJECT_BARREL, 1),
+                    Map.of(OBJECT_BARREL, 1),
                     List.of(
                             "□□□□□□□□□",
                             "□□□□□□□□□",
@@ -1053,8 +1054,8 @@ public class PointStore {
             //"XXXXXX   ",
             //"XXXXXX   "))),
             new PointDto(40L, 25L, 500L, 2500L, 3000L,
-                    Map.of(DataObjects.OBJECT_BETA, 18,
-                            DataObjects.OBJECT_ALPHA, 3),
+                    Map.of(OBJECT_BETA, 18,
+                            OBJECT_ALPHA, 3),
                     List.of(
                             "□□□□□□□□□",
                             "□□□□□□□□□",
@@ -1077,7 +1078,7 @@ public class PointStore {
                     "          "
             ))),
             new PointDto(41L, 20L, 500L, 2500L, 2200L,
-                    Map.of(DataObjects.OBJECT_BARREL, 2),
+                    Map.of(OBJECT_BARREL, 2),
                     List.of(
                             "",
                             "□□□□□□□□□",
@@ -1108,7 +1109,7 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(42L, 25L, 500L, 2500L, 3300L,
-                    Map.of(DataObjects.OBJECT_BARREL, 3),
+                    Map.of(OBJECT_BARREL, 3),
                     List.of(
                             " □  □  □ ",
                             "□□□□□□□□□",
@@ -1150,7 +1151,7 @@ public class PointStore {
                     "□□□□□□□□□",
                     "       "))),
             new PointDto(43L, 25L, 500L, 2500L, 2980L,
-                    Map.of(DataObjects.OBJECT_BARREL, 2),
+                    Map.of(OBJECT_BARREL, 2),
                     List.of(
                             "  □    □  ",
                             " □□□□□□□□",
@@ -1182,7 +1183,7 @@ public class PointStore {
                     ""
             ))),
             new PointDto(44L, 30L, 500L, 2500L, 2400L,
-                    Map.of(DataObjects.OBJECT_BARREL, 5),
+                    Map.of(OBJECT_BARREL, 5),
                     List.of(
                             "  □□□□□  ",
                             "  □□□□□ ",
@@ -1202,7 +1203,7 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(45L, 15L, 500L, 2500L, 1000L,
-                    Map.of(DataObjects.OBJECT_BARREL, 2),
+                    Map.of(OBJECT_BARREL, 2),
                     List.of(
                             " □□□□□□",
                             "□□□□□□□□",
@@ -1219,7 +1220,7 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(46L, 15L, 500L, 2500L, 200L,
-                    Map.of(DataObjects.OBJECT_SAND, 6),
+                    Map.of(OBJECT_SAND, 6),
                     List.of(
                             "□□□□□□",
                             "□□□□□□",
@@ -1234,8 +1235,8 @@ public class PointStore {
                     "YPYSBY",
                     "PRSYRG"), Collections.emptyList()),
             new PointDto(47L, 40L, 600L, 2500L, 3300L,
-                    Map.of(DataObjects.OBJECT_SAND, 9,
-                            DataObjects.OBJECT_GREEN, 25),
+                    Map.of(OBJECT_SAND, 9,
+                            OBJECT_GREEN, 25),
                     List.of(
                             " □□□ □□□ ",
                             " □□□ □□□ ",
@@ -1255,8 +1256,8 @@ public class PointStore {
                             //"RBSBSGBP",
                             "??GBRRG??"), Collections.emptyList()),
             new PointDto(48L, 20L, 600L, 2500L, 1000L,
-                    Map.of(DataObjects.OBJECT_RED, 18,
-                            DataObjects.OBJECT_BLUE, 18),
+                    Map.of(OBJECT_RED, 18,
+                            OBJECT_BLUE, 18),
                     List.of(
                             "  □   □  ",
                             " □□□ □□□ ",
@@ -1274,8 +1275,8 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(49L, 30L, 600L, 1000L, 1200L,
-                    Map.of(DataObjects.OBJECT_PURPLE, 20,
-                            DataObjects.OBJECT_YELLOW, 20),//whites
+                    Map.of(OBJECT_PURPLE, 20,
+                            OBJECT_YELLOW, 20),//whites
                     List.of(
                             " □□□□□□ ",
                             "□□□□□□□□",
@@ -1294,9 +1295,9 @@ public class PointStore {
                     "????????",
                     "S?S?S?S?"), Collections.emptyList()),
             new PointDto(50L, 30L, 600L, 2500L, 4100L,
-                    Map.of(DataObjects.OBJECT_SAND, 8,
-                            DataObjects.OBJECT_BETA, 12,
-                            DataObjects.OBJECT_BOX, 12),
+                    Map.of(OBJECT_SAND, 8,
+                            OBJECT_BETA, 12,
+                            OBJECT_BOX, 12),
                     List.of(
                             "   □□□□",
                             "  □□□□□",
@@ -1332,7 +1333,7 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(51L, 10L, 600L, 2500L, 500L,
-                    Map.of(DataObjects.OBJECT_GAMMA, 4),
+                    Map.of(OBJECT_GAMMA, 4),
                     List.of(
                             "□□□□□□",
                             "□□□□□□",
@@ -1356,8 +1357,8 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(52L, 40L, 600L, 2500L, 3100L,
-                    Map.of(DataObjects.OBJECT_GAMMA, 14,
-                            DataObjects.OBJECT_BARREL, 2),
+                    Map.of(OBJECT_GAMMA, 14,
+                            OBJECT_BARREL, 2),
                     List.of(
                             "□□□□□□□□□",
                             "□□□□□□□□□",
@@ -1376,8 +1377,8 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(53L, 40L, 500L, 2500L, 5000L,
-                    Map.of(DataObjects.OBJECT_GAMMA, 25,
-                            DataObjects.OBJECT_BARREL, 4),
+                    Map.of(OBJECT_GAMMA, 25,
+                            OBJECT_BARREL, 4),
                     List.of(
                             " □ □ □ □ ",
                             " □ □ □ □ ",
@@ -1399,8 +1400,8 @@ public class PointStore {
                     /* α β γ ■ ╱ ╲ Ξ ᥩ ‖ */
             ))),
             new PointDto(54L, 25L, 500L, 2500L, 3000L,
-                    Map.of(DataObjects.OBJECT_GAMMA, 20,
-                            DataObjects.OBJECT_PURPLE, 20),
+                    Map.of(OBJECT_GAMMA, 20,
+                            OBJECT_PURPLE, 20),
                     List.of(
                             "□□ □□□ □□",
                             "□□ □□□ □□",

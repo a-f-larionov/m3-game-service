@@ -1,7 +1,7 @@
 package m3.gameplay.dto;
 
 import lombok.*;
-import m3.gameplay.enums.DataObjects;
+import m3.lib.enums.ObjectEnum;
 
 @AllArgsConstructor
 @Getter
@@ -11,6 +11,6 @@ import m3.gameplay.enums.DataObjects;
 @EqualsAndHashCode
 public class PrizeDto {
 
-    private DataObjects id;
+    private ObjectEnum id;
     private Long count;
 }

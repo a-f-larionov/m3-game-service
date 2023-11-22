@@ -15,18 +15,24 @@ import m3.gameplay.services.MapService;
 import m3.gameplay.services.PointsService;
 import m3.gameplay.services.StuffService;
 import m3.gameplay.store.MapStore;
+import m3.lib.dto.ProductDto;
 import m3.lib.entities.UserPointEntity;
 import m3.lib.entities.UserStuffEntity;
+import m3.lib.enums.ClientLogLevels;
+import m3.lib.enums.ObjectEnum;
 import m3.lib.enums.StatisticEnum;
 import m3.lib.repositories.UserPointRepository;
 import m3.lib.repositories.UserRepository;
 import m3.lib.repositories.UserStuffRepository;
+import m3.lib.store.ShopStore;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
+import static m3.lib.enums.StatisticEnum.*;
 
 @Service
 @Transactional
@@ -97,16 +103,20 @@ public class MapServiceImpl implements MapService {
 
         return scoreMapper.toDto(
                 userId,
-                topScore.get(0) != null ? topScore.get(0).getId().getUserId() : null,
-                topScore.get(1) != null ? topScore.get(1).getId().getUserId() : null,
-                topScore.get(2) != null ? topScore.get(2).getId().getUserId() : null,
+                getPlace1Uid(topScore, 0),
+                getPlace1Uid(topScore, 1),
+                getPlace1Uid(topScore, 2),
                 userPosition,
                 pointId
         );
     }
 
+    private static Long getPlace1Uid(List<UserPointEntity> topScore, int index) {
+        return topScore.size() > index ? topScore.get(index).getId().getUserId() : null;
+    }
+
     @Override
-    public GotStuffRsDto getUserStuff(Long userId) {
+    public GotStuffRsDto getUserStuffRsDto(Long userId) {
         Optional<UserStuffEntity> userStuff = userStuffRepository.findById(userId);
         if (userStuff.isEmpty()) {
             userStuffRepository.creatUserStuff(userId);
@@ -116,8 +126,8 @@ public class MapServiceImpl implements MapService {
     }
 
     private void updateUserPoint(Long userId, Long pointId, Long score) {
-        userPointRepository.updateUserPoint(userId, pointId, score);
         commonSender.statistic(userId, StatisticEnum.ID_FINISH_PLAY, pointId.toString(), score.toString());
+        userPointRepository.updateUserPoint(userId, pointId, score);
         //     TopScoreCache.flush(cntx.user.id, pointId);
     }
 
@@ -145,6 +155,142 @@ public class MapServiceImpl implements MapService {
 
         //@Todo transaction control!
         commonSender.statistic(userId, StatisticEnum.ID_OPEN_CHEST, chestId.toString());
+    }
+
+    @Override
+    public GotStuffRsDto spendCoinsForTurns(Long userId) {
+        var product = ShopStore.turnsUp;
+        var userStuff = getUserStuff(userId);
+
+        decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.OBJECT_GOLD);
+
+        commonSender.statistic(userId, StatisticEnum.ID_BUY_TURNS);
+        return stuffMapper.entityToDto(userStuff);
+    }
+
+    @Override
+    public GotStuffRsDto buyHealth(Long userId, Long index) {
+//
+
+
+//            DataUser.getById(cntx.user.id, function (user) {
+//                if (LogicHealth.getHealths(user) > 0) {
+//                    Logs.log("buy health tid:" + tid + " uid:" + user.id + " NO ZERO", Logs.LEVEL_INFO, user, Logs.TYPE_VK_HEALTH);
+//                    done();
+//                    pFinish(prid);
+//                } else {
+//                    Statistic.write(cntx.userId, Statistic.ID_BUY_HEALTH);
+//                    DataStuff.usedGold(cntx.user.id, DataShop.healthGoldPrice, tid, function (success, currentGold) {
+//                        if (!success) {
+//                            Logs.log("buy health tid:" + tid + " uid:" + user.id + " CANCEL", Logs.LEVEL_INFO, user, Logs.TYPE_VK_HEALTH);
+//                            done();
+//                        } else {
+//                            Logs.log("buy health tid:" + tid + " uid:" + user.id + " +" + LogicHealth.getMaxHealth() + " OK", Logs.LEVEL_TRACE, user, Logs.TYPE_VK_HEALTH, true);
+//                            LogicHealth.setMaxHealth(user);
+//                            Logs.log("Игрок " + cntx.user.socNetUserId + " купил жизней❤❤❤❤❤, 💰  " + currentGold + "(-" + DataShop.healthGoldPrice + ")", Logs.LEVEL_TRACE,
+//                                    undefined, Logs.CHANNEL_TELEGRAM);
+//                            DataUser.updateHealthAndStartTime(user, function () {
+//                                CAPIUser.updateUserInfo(cntx.user.id, user);
+//                                done();
+//
+//                            }
+//                                )
+//                        }
+//                    });
+//                }
+//            })
+//        }
+//        );
+        return null;
+    }
+
+
+    @Override
+    public GotStuffRsDto buyProduct(Long userId, Long index, ObjectEnum objectId) {
+        var product = ShopStore.getProduct(index, objectId);
+        UserStuffEntity userStuff = getUserStuff(userId);
+
+        decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.OBJECT_GOLD);
+        incrementStuff(userStuff, product);
+
+        userStuffRepository.save(userStuff);
+
+        commonSender.statistic(userId, getStatIdFromObjectId(product));
+        commonSender.log(userId,
+                "Игрок " + userId + " купил " + product.getObjectEnum().getComment() +
+                        ", теперь: " + userStuff.getQuantity(product.getObjectEnum()) +
+                        ", 💰 " + userStuff.getGoldQty(),
+                ClientLogLevels.INFO, true);
+
+        return stuffMapper.entityToDto(userStuff);
+    }
+
+    private static StatisticEnum getStatIdFromObjectId(ProductDto product) {
+        return switch (product.getObjectEnum()) {
+            case STUFF_HUMMER -> StatisticEnum.ID_BUY_HUMMER;
+            case STUFF_LIGHTNING -> StatisticEnum.ID_BUY_LIGHTNING;
+            case STUFF_SHUFFLE -> StatisticEnum.ID_BUY_SHUFFLE;
+            default -> throw new RuntimeException("No found stat for objectId");
+        };
+    }
+
+    private UserStuffEntity getUserStuff(Long userId) {
+        return userStuffRepository
+                .findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    private static void incrementStuff(UserStuffEntity stuff, ProductDto product) {
+        switch (product.getObjectEnum()) {
+            case STUFF_HUMMER -> stuff.setHummerQty(stuff.getHummerQty() + product.getQuantity());
+            case STUFF_LIGHTNING -> stuff.setLightningQty(stuff.getHummerQty() + product.getQuantity());
+            case STUFF_SHUFFLE -> stuff.setShuffleQty(stuff.getShuffleQty() + product.getQuantity());
+            case STUFF_GOLD -> stuff.setGoldQty(stuff.getGoldQty() + product.getQuantity());
+        }
+    }
+
+    private static void decrementStuff(UserStuffEntity stuff, Long quality, ObjectEnum objectId) {
+        switch (objectId) {
+            case STUFF_HUMMER -> stuff.setHummerQty(stuff.getHummerQty() - quality);
+            case STUFF_LIGHTNING -> stuff.setLightningQty(stuff.getLightningQty() - quality);
+            case STUFF_SHUFFLE -> stuff.setShuffleQty(stuff.getShuffleQty() - quality);
+            case OBJECT_GOLD -> stuff.setGoldQty(stuff.getGoldQty() - quality);
+        }
+    }
+
+    private static void decrementGold(UserStuffEntity stuff, ProductDto product) {
+        if (stuff.getGoldQty() < product.getPriceGold()) {
+            throw new RuntimeException("Not gold enough");
+        }
+        stuff.setGoldQty(stuff.getGoldQty() - product.getPriceGold());
+    }
+
+    @Override
+    public GotStuffRsDto spendProduct(Long userId, ObjectEnum objectId) {
+        var userStuff = getUserStuff(userId);
+
+        decrementStuff(userStuff, 1L, objectId);
+
+        commonSender.statistic(userId, getUsedStatFromObject(objectId));
+        commonSender.log(userId, "Игрок " + userId + " использовал " + objectId.getComment() +
+                " теперь " + userStuff.toString(), ClientLogLevels.INFO, true);
+
+        return stuffMapper.entityToDto(userStuff);
+    }
+
+    private static StatisticEnum getUsedStatFromObject(ObjectEnum objectId) {
+        switch (objectId) {
+            case STUFF_HUMMER -> {
+                return ID_HUMMER_USE;
+            }
+            case STUFF_LIGHTNING -> {
+                return ID_LIGHTNING_USE;
+            }
+            case STUFF_SHUFFLE -> {
+                return ID_SHUFFLE_USE;
+            }
+        }
+        throw new RuntimeException("Not found stat for objectIdo");
     }
 
     private void sendStuffToUser(Long userId) {
