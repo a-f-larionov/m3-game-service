@@ -5,6 +5,7 @@ import m3.gameplay.dto.rs.*;
 import m3.gameplay.services.MapService;
 import m3.gameplay.store.MapStore;
 import m3.gameplay.store.PointStore;
+import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 import org.junit.jupiter.api.Test;
 
@@ -168,7 +169,7 @@ class TopicGamePlayKafkaListenerTest {
         var userId = 100L;
         var index = 200L;
         var rq = BuyHealthRqDto.builder().userId(userId).index(index).build();
-        var expectedRs = buildGotStuffRsDto(userId);
+        var expectedRs = UpdateUserInfoRsDto.builder().userId(userId).fullRecoveryTime(123L).build();
         when(mapService.buyHealth(any(), any())).thenReturn(expectedRs);
 
         // when
@@ -244,7 +245,7 @@ class TopicGamePlayKafkaListenerTest {
         var userId = 100L;
         var rq = UsedHummerRqDto.builder().userId(userId).build();
         var expectedRs = buildGotStuffRsDto(userId);
-        when(mapService.spendMagic(any(),any())).thenReturn(expectedRs);
+        when(mapService.spendMagic(any(), any())).thenReturn(expectedRs);
 
         // when
         var actualRs = gameplayListener.usedHummer(rq);
@@ -262,7 +263,7 @@ class TopicGamePlayKafkaListenerTest {
         var userId = 100L;
         var rq = UsedLightningRqDto.builder().userId(userId).build();
         var expectedRs = buildGotStuffRsDto(userId);
-        when(mapService.spendMagic(any(),any())).thenReturn(expectedRs);
+        when(mapService.spendMagic(any(), any())).thenReturn(expectedRs);
 
         // when
         var actualRs = gameplayListener.usedLightning(rq);
@@ -280,7 +281,7 @@ class TopicGamePlayKafkaListenerTest {
         var userId = 100L;
         var rq = UsedShuffleRqDto.builder().userId(userId).build();
         var expectedRs = buildGotStuffRsDto(userId);
-        when(mapService.spendMagic(any(),any())).thenReturn(expectedRs);
+        when(mapService.spendMagic(any(), any())).thenReturn(expectedRs);
 
         // when
         var actualRs = gameplayListener.usedShuffle(rq);

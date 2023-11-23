@@ -154,7 +154,7 @@ class MapServiceImplTest {
         // then
         Assertions.assertThatCode(callable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("User not found");
+                .hasMessage("User not found.");
         verify(userRepository, times(1)).findById(eq(userId));
     }
 
@@ -220,8 +220,8 @@ class MapServiceImplTest {
         when(stuffMapper.entityToDto(any()))
                 .thenReturn(expectedStuffDto);
 
-        when(userStuffRepository.getByUserId(any()))
-                .thenReturn(expectedStuffEntity);
+        when(userStuffRepository.findById(any()))
+                .thenReturn(Optional.of(expectedStuffEntity));
 
         // when
         mapService.onFinish(userId, pointId, score, chestId);
@@ -233,9 +233,9 @@ class MapServiceImplTest {
         verify(stuffService).giveAShuffle(eq(userId), eq(400L));
         verify(stuffService).giveAGold(eq(userId), eq(100L));
 
-        verify(userStuffRepository).getByUserId(eq(userId));
-        verify(userStuffRepository).getByUserId(userId);
-        verify(stuffMapper).entityToDto(expectedStuffEntity);
+        verify(userStuffRepository).findById(eq(userId));
+        //verify(userStuffRepository).getByUserId(userId);
+        verify(stuffMapper).entityToDto(eq(expectedStuffEntity));
         verify(kafkaTemplate).send(eq("topic-client"), eq(expectedStuffDto));
 
         verify(commonSender).statistic(eq(userId), eq(StatisticEnum.ID_FINISH_PLAY), eq(pointId.toString()), eq(score.toString()));

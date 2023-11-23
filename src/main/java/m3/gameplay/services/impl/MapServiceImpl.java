@@ -16,11 +16,14 @@ import m3.gameplay.services.PointsService;
 import m3.gameplay.services.StuffService;
 import m3.gameplay.store.MapStore;
 import m3.lib.dto.ProductDto;
+import m3.lib.dto.rs.UpdateUserInfoRsDto;
+import m3.lib.entities.UserEntity;
 import m3.lib.entities.UserPointEntity;
 import m3.lib.entities.UserStuffEntity;
 import m3.lib.enums.ClientLogLevels;
 import m3.lib.enums.ObjectEnum;
 import m3.lib.enums.StatisticEnum;
+import m3.lib.helpers.UserHelper;
 import m3.lib.repositories.UserPointRepository;
 import m3.lib.repositories.UserRepository;
 import m3.lib.repositories.UserStuffRepository;
@@ -87,8 +90,7 @@ public class MapServiceImpl implements MapService {
     @Override
     public void onFinish(Long userId, Long pointId, Long score, Long chestId) {
         // @todo transactional one for all method
-        // check exists
-        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        getUser(userId);
 
         updateUserPoint(userId, pointId, score);
         nextPointUp(userId, pointId);
@@ -162,55 +164,47 @@ public class MapServiceImpl implements MapService {
         var product = ShopStore.turnsUp;
         var userStuff = getUserStuff(userId);
 
-        decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.OBJECT_GOLD);
+        decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.STUFF_GOLD);
+
+        userStuffRepository.save(userStuff);
 
         commonSender.statistic(userId, StatisticEnum.ID_BUY_TURNS);
         return stuffMapper.entityToDto(userStuff);
     }
 
     @Override
-    public GotStuffRsDto buyHealth(Long userId, Long index) {
-//
+    public UpdateUserInfoRsDto buyHealth(Long userId, Long index) {
+        var userEntity = getUser(userId);
+        var userStuff = getUserStuff(userId);
 
+        if (UserHelper.getHealths(userEntity) > 0) {
+            commonSender.log(userId, "The user has more than zero lives.o", ClientLogLevels.WARN, true);
+        }
+        decrementStuff(userStuff, ShopStore.health.getPriceGold(), ObjectEnum.STUFF_GOLD);
+        UserHelper.setMaxHealth(userEntity);
 
-//            DataUser.getById(cntx.user.id, function (user) {
-//                if (LogicHealth.getHealths(user) > 0) {
-//                    Logs.log("buy health tid:" + tid + " uid:" + user.id + " NO ZERO", Logs.LEVEL_INFO, user, Logs.TYPE_VK_HEALTH);
-//                    done();
-//                    pFinish(prid);
-//                } else {
-//                    Statistic.write(cntx.userId, Statistic.ID_BUY_HEALTH);
-//                    DataStuff.usedGold(cntx.user.id, DataShop.healthGoldPrice, tid, function (success, currentGold) {
-//                        if (!success) {
-//                            Logs.log("buy health tid:" + tid + " uid:" + user.id + " CANCEL", Logs.LEVEL_INFO, user, Logs.TYPE_VK_HEALTH);
-//                            done();
-//                        } else {
-//                            Logs.log("buy health tid:" + tid + " uid:" + user.id + " +" + LogicHealth.getMaxHealth() + " OK", Logs.LEVEL_TRACE, user, Logs.TYPE_VK_HEALTH, true);
-//                            LogicHealth.setMaxHealth(user);
-//                            Logs.log("Игрок " + cntx.user.socNetUserId + " купил жизней❤❤❤❤❤, 💰  " + currentGold + "(-" + DataShop.healthGoldPrice + ")", Logs.LEVEL_TRACE,
-//                                    undefined, Logs.CHANNEL_TELEGRAM);
-//                            DataUser.updateHealthAndStartTime(user, function () {
-//                                CAPIUser.updateUserInfo(cntx.user.id, user);
-//                                done();
-//
-//                            }
-//                                )
-//                        }
-//                    });
-//                }
-//            })
-//        }
-//        );
-        return null;
+        userRepository.save(userEntity);
+        userStuffRepository.save(userStuff);
+
+        commonSender.log(userId, "Игрок " + userId + " купил жизней❤❤❤❤❤ " + userStuff.toString(), ClientLogLevels.INFO, true);
+        commonSender.statistic(userId, ID_BUY_HEALTH);
+
+        sendStuffToUser(userId);
+        return mapMapper.entityToDto(userEntity);
     }
 
+    private UserEntity getUser(Long userId) {
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found."));
+    }
 
     @Override
     public GotStuffRsDto buyProduct(Long userId, Long index, ObjectEnum objectId) {
         var product = ShopStore.getProduct(index, objectId);
         UserStuffEntity userStuff = getUserStuff(userId);
 
-        decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.OBJECT_GOLD);
+        decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.STUFF_GOLD);
         incrementStuff(userStuff, product);
 
         userStuffRepository.save(userStuff);
@@ -247,12 +241,6 @@ public class MapServiceImpl implements MapService {
         };
     }
 
-    private UserStuffEntity getUserStuff(Long userId) {
-        return userStuffRepository
-                .findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
     private static void incrementStuff(UserStuffEntity stuff, ProductDto product) {
         switch (product.getObjectEnum()) {
             case STUFF_HUMMER -> stuff.setHummerQty(stuff.getHummerQty() + product.getQuantity());
@@ -267,7 +255,7 @@ public class MapServiceImpl implements MapService {
             case STUFF_HUMMER -> stuff.setHummerQty(stuff.getHummerQty() - quality);
             case STUFF_LIGHTNING -> stuff.setLightningQty(stuff.getLightningQty() - quality);
             case STUFF_SHUFFLE -> stuff.setShuffleQty(stuff.getShuffleQty() - quality);
-            case OBJECT_GOLD -> stuff.setGoldQty(stuff.getGoldQty() - quality);
+            case STUFF_GOLD -> stuff.setGoldQty(stuff.getGoldQty() - quality);
         }
     }
 
@@ -287,8 +275,14 @@ public class MapServiceImpl implements MapService {
     }
 
     private void sendStuffToUser(Long userId) {
-        var stuff = userStuffRepository.getByUserId(userId);
+        var stuff = getUserStuff(userId);
         GotStuffRsDto stuffRsDto = stuffMapper.entityToDto(stuff);
         kafkaTemplate.send("topic-client", stuffRsDto);
+    }
+
+    private UserStuffEntity getUserStuff(Long userId) {
+        return userStuffRepository
+                .findById(userId)
+                .orElseThrow(() -> new RuntimeException("User stuff not found"));
     }
 }

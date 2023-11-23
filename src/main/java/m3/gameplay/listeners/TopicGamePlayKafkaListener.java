@@ -8,6 +8,7 @@ import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
 import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.services.MapService;
+import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -59,7 +60,7 @@ public class TopicGamePlayKafkaListener {
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto buyHealth(BuyHealthRqDto rq) {
+    public UpdateUserInfoRsDto buyHealth(BuyHealthRqDto rq) {
         return mapService.buyHealth(rq.getUserId(), rq.getIndex());
     }
 
@@ -68,7 +69,7 @@ public class TopicGamePlayKafkaListener {
     public GotStuffRsDto buyHummer(BuyHummerRqDto rq) {
         return mapService.buyProduct(rq.getUserId(), rq.getIndex(), ObjectEnum.STUFF_HUMMER);
     }
-    
+
     @KafkaHandler
     @SendTo("topic-client")
     public GotStuffRsDto buyLightning(BuyLightningRqDto rq) {

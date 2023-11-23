@@ -5,10 +5,12 @@ import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.dto.rs.ScoreRsDto;
 import m3.gameplay.services.MapService;
+import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 import m3.lib.repositories.UserRepository;
 import m3.lib.repositories.UserStuffRepository;
 import m3.lib.store.ShopStore;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +109,8 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
     void spendCoinsForTurns() {
         // given
         Long userId = 103L;
-        var expectedRs = buildGotStuffRSDto(userId, 1000L - ShopStore.turnsUp.getPriceGold(), 10L, 20L, 30L);
+        var product = ShopStore.turnsUp;
+        var expectedRs = buildGotStuffRSDto(userId, 1000L - product.getPriceGold(), 10L, 20L, 30L);
         setUserStuff(userId, 1000L, 10L, 20L, 30L);
 
         // when
@@ -115,18 +118,20 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
 
         // then
         assertThat(actualRs).isEqualTo(expectedRs);
-        assertDbUserStuff(userId, 1000L - ShopStore.turnsUp.getPriceGold(), 10L, 20L, 30L);
+        assertDbUserStuff(userId, 1000L - product.getPriceGold(), 10L, 20L, 30L);
     }
 
     @Test
     void buyProduct() {
         // given
         Long userId = 104L;
+        Long itemIndex = 1L;
+        var product = ShopStore.getProduct(1L, ObjectEnum.STUFF_HUMMER);
         setUserStuff(userId, 5000L, 10L, 20L, 30L);
-        var expectedRs = buildGotStuffRSDto(userId, 4000L, 16L, 20L, 30L);
+        var expectedRs = buildGotStuffRSDto(userId, 5000L - product.getPriceGold(), 16L, 20L, 30L);
 
         // when
-        GotStuffRsDto actualRs = mapService.buyProduct(userId, 1L, ObjectEnum.STUFF_HUMMER);
+        GotStuffRsDto actualRs = mapService.buyProduct(userId, itemIndex, ObjectEnum.STUFF_HUMMER);
 
         // then
         assertThat(actualRs).isEqualTo(expectedRs);
@@ -145,7 +150,37 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
 
         // then
         assertThat(actualRs).isEqualTo(expectedRs);
-        assertDbUserStuff(userId, 5000L, 9L, 20L,30L);
+        assertDbUserStuff(userId, 5000L, 9L, 20L, 30L);
+    }
+
+    @Test
+    void buyHealth() {
+        // given
+        var currenttime = (long) Math.floor((double) System.currentTimeMillis() / 1000);
+        Long userId = 106L;
+        Long itemIndex = 1L;
+        var product = ShopStore.health;
+
+        setUserStuff(userId, 10000L, 100L, 200L, 300L);
+        deleteAllUsers();
+        jdbcTemplate.update("INSERT INTO users (id, socNetUserId, socNetTypeId, create_tm, login_tm, logout_tm, nextPointId, fullRecoveryTime) " +
+                "VALUES (?, 1, 2, 3, 4, 5, 6, 7)", userId);
+        mapService.getUserStuffRsDto(userId);// for create stuff
+
+        // when
+        UpdateUserInfoRsDto actualRs = mapService.buyHealth(userId, itemIndex);
+
+        // then
+        assertThat(actualRs.getFullRecoveryTime()).isCloseTo(currenttime, Offset.offset(10L));
+        assertDbUserStuff(userId, 10000L - product.getPriceGold(), 100L, 200L, 300L);
+
+        Map<String, Object> dbState = jdbcTemplate.queryForMap("SELECT * FROM users WHERE id = ?", userId);
+        Long fullRecoveryTime = (Long) dbState.get("fullRecoveryTime");
+        assertThat(fullRecoveryTime).isCloseTo(currenttime, Offset.offset(10L));
+    }
+
+    private void deleteAllUsers() {
+        jdbcTemplate.update("DELETE FROM users WHERE create_tm IS NOT NULL OR create_tm IS NULL");
     }
 
     private void setUserStuff(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
