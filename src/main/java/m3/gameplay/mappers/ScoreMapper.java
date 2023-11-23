@@ -11,7 +11,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ScoreMapper {
-
     GotPointTopScoreRsDto toDto(Long userId, Long place1Uid, Long place2Uid, Long place3Uid, Long pos, Long pointId);
 
     @Mapping(target = "userId", source = "userId")

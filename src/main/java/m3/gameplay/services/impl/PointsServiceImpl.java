@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PointsServiceImpl implements PointsService {
 
-        @Override
+    @Override
     public List<PointDto> getPointsByMapId(Long mapId) {
 
         Long firstPointId = MapSettings.getFirstPointId(mapId);
