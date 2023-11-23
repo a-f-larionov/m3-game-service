@@ -225,6 +225,19 @@ public class MapServiceImpl implements MapService {
         return stuffMapper.entityToDto(userStuff);
     }
 
+    @Override
+    public GotStuffRsDto spendMagic(Long userId, ObjectEnum objectId) {
+        var userStuff = getUserStuff(userId);
+
+        decrementStuff(userStuff, 1L, objectId);
+
+        commonSender.statistic(userId, getUsedStatFromObject(objectId));
+        commonSender.log(userId, "Игрок " + userId + " использовал " + objectId.getComment() +
+                " теперь " + userStuff.toString(), ClientLogLevels.INFO, true);
+
+        return stuffMapper.entityToDto(userStuff);
+    }
+
     private static StatisticEnum getStatIdFromObjectId(ProductDto product) {
         return switch (product.getObjectEnum()) {
             case STUFF_HUMMER -> StatisticEnum.ID_BUY_HUMMER;
@@ -256,26 +269,6 @@ public class MapServiceImpl implements MapService {
             case STUFF_SHUFFLE -> stuff.setShuffleQty(stuff.getShuffleQty() - quality);
             case OBJECT_GOLD -> stuff.setGoldQty(stuff.getGoldQty() - quality);
         }
-    }
-
-    private static void decrementGold(UserStuffEntity stuff, ProductDto product) {
-        if (stuff.getGoldQty() < product.getPriceGold()) {
-            throw new RuntimeException("Not gold enough");
-        }
-        stuff.setGoldQty(stuff.getGoldQty() - product.getPriceGold());
-    }
-
-    @Override
-    public GotStuffRsDto spendProduct(Long userId, ObjectEnum objectId) {
-        var userStuff = getUserStuff(userId);
-
-        decrementStuff(userStuff, 1L, objectId);
-
-        commonSender.statistic(userId, getUsedStatFromObject(objectId));
-        commonSender.log(userId, "Игрок " + userId + " использовал " + objectId.getComment() +
-                " теперь " + userStuff.toString(), ClientLogLevels.INFO, true);
-
-        return stuffMapper.entityToDto(userStuff);
     }
 
     private static StatisticEnum getUsedStatFromObject(ObjectEnum objectId) {

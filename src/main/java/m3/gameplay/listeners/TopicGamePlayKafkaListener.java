@@ -84,18 +84,18 @@ public class TopicGamePlayKafkaListener {
     @KafkaHandler
     @SendTo("topic-client")
     public GotStuffRsDto usedHummer(UsedHummerRqDto rq) {
-        return mapService.spendProduct(rq.getUserId(), ObjectEnum.STUFF_HUMMER);
+        return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_HUMMER);
     }
 
     @KafkaHandler
     @SendTo("topic-client")
     public GotStuffRsDto usedLightning(UsedLightningRqDto rq) {
-        return mapService.spendProduct(rq.getUserId(), ObjectEnum.STUFF_LIGHTNING);
+        return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_LIGHTNING);
     }
 
     @KafkaHandler
     @SendTo("topic-client")
     public GotStuffRsDto usedShuffle(UsedShuffleRqDto rq) {
-        return mapService.spendProduct(rq.getUserId(), ObjectEnum.STUFF_SHUFFLE);
+        return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_SHUFFLE);
     }
 }

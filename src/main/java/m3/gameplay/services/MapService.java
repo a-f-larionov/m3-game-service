@@ -30,6 +30,6 @@ public interface MapService {
 
     GotStuffRsDto buyProduct(Long userId, Long index, ObjectEnum objectId);
 
-    GotStuffRsDto spendProduct(Long userId, ObjectEnum objectId);
+    GotStuffRsDto spendMagic(Long userId, ObjectEnum objectId);
 
 }

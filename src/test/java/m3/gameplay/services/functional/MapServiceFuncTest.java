@@ -22,8 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(properties = {
         "logging.level.org.hibernate=DEBUG",
-        //        "logging.level.logger.org.springframework.transaction=TRACE",
-        "logging.level.logger.org.apache.kafka=FATAL",
+        "logging.level.logger.org.apache.kafka=OFF",
         "logging.level.org.springframework.orm.jpa=DEBUG",
         "logging.level.org.springframework.transaction=DEBUG",
         "spring.jpa.show-sql=true"
@@ -135,14 +134,14 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
     }
 
     @Test
-    void spendProduct() {
+    void spendMagic() {
         // given
         Long userId = 105L;
         setUserStuff(userId, 5000L, 10L, 20L, 30L);
         var expectedRs = buildGotStuffRSDto(userId, 5000L, 9L, 20L, 30L);
 
         // when
-        GotStuffRsDto actualRs = mapService.spendProduct(userId, ObjectEnum.STUFF_HUMMER);
+        GotStuffRsDto actualRs = mapService.spendMagic(userId, ObjectEnum.STUFF_HUMMER);
 
         // then
         assertThat(actualRs).isEqualTo(expectedRs);

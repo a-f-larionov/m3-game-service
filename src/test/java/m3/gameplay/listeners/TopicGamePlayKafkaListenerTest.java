@@ -244,7 +244,7 @@ class TopicGamePlayKafkaListenerTest {
         var userId = 100L;
         var rq = UsedHummerRqDto.builder().userId(userId).build();
         var expectedRs = buildGotStuffRsDto(userId);
-        when(mapService.spendProduct(any(),any())).thenReturn(expectedRs);
+        when(mapService.spendMagic(any(),any())).thenReturn(expectedRs);
 
         // when
         var actualRs = gameplayListener.usedHummer(rq);
@@ -253,7 +253,7 @@ class TopicGamePlayKafkaListenerTest {
         assertThat(actualRs)
                 .isEqualTo(expectedRs);
         verify(mapService)
-                .spendProduct(userId, ObjectEnum.STUFF_HUMMER);
+                .spendMagic(userId, ObjectEnum.STUFF_HUMMER);
     }
 
     @Test
@@ -262,7 +262,7 @@ class TopicGamePlayKafkaListenerTest {
         var userId = 100L;
         var rq = UsedLightningRqDto.builder().userId(userId).build();
         var expectedRs = buildGotStuffRsDto(userId);
-        when(mapService.spendProduct(any(),any())).thenReturn(expectedRs);
+        when(mapService.spendMagic(any(),any())).thenReturn(expectedRs);
 
         // when
         var actualRs = gameplayListener.usedLightning(rq);
@@ -271,7 +271,7 @@ class TopicGamePlayKafkaListenerTest {
         assertThat(actualRs)
                 .isEqualTo(expectedRs);
         verify(mapService)
-                .spendProduct(userId, ObjectEnum.STUFF_LIGHTNING);
+                .spendMagic(userId, ObjectEnum.STUFF_LIGHTNING);
     }
 
     @Test
@@ -280,7 +280,7 @@ class TopicGamePlayKafkaListenerTest {
         var userId = 100L;
         var rq = UsedShuffleRqDto.builder().userId(userId).build();
         var expectedRs = buildGotStuffRsDto(userId);
-        when(mapService.spendProduct(any(),any())).thenReturn(expectedRs);
+        when(mapService.spendMagic(any(),any())).thenReturn(expectedRs);
 
         // when
         var actualRs = gameplayListener.usedShuffle(rq);
@@ -289,7 +289,7 @@ class TopicGamePlayKafkaListenerTest {
         assertThat(actualRs)
                 .isEqualTo(expectedRs);
         verify(mapService)
-                .spendProduct(userId, ObjectEnum.STUFF_SHUFFLE);
+                .spendMagic(userId, ObjectEnum.STUFF_SHUFFLE);
     }
 
     private static GotStuffRsDto buildGotStuffRsDto(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
