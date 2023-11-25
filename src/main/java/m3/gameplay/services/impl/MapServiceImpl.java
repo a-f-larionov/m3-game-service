@@ -2,10 +2,10 @@ package m3.gameplay.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import m3.gameplay.dto.MapDto;
-import m3.gameplay.dto.rs.GotMapInfoRsDto;
-import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
-import m3.gameplay.dto.rs.GotScoresRsDto;
-import m3.gameplay.dto.rs.GotStuffRsDto;
+import m3.gameplay.dto.rq.DoOrderChangeRqDto;
+import m3.gameplay.dto.rs.*;
+import m3.gameplay.dto.vk.rs.VKOrderSuccess;
+import m3.gameplay.dto.vk.rs.VKOrderSuccessRepsponse;
 import m3.gameplay.kafka.sender.CommonSender;
 import m3.gameplay.mappers.MapMapper;
 import m3.gameplay.mappers.ScoreMapper;
@@ -17,6 +17,7 @@ import m3.gameplay.services.StuffService;
 import m3.gameplay.store.MapStore;
 import m3.lib.dto.ProductDto;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
+import m3.lib.entities.PaymentEntity;
 import m3.lib.entities.UserEntity;
 import m3.lib.entities.UserPointEntity;
 import m3.lib.entities.UserStuffEntity;
@@ -24,6 +25,7 @@ import m3.lib.enums.ClientLogLevels;
 import m3.lib.enums.ObjectEnum;
 import m3.lib.enums.StatisticEnum;
 import m3.lib.helpers.UserHelper;
+import m3.lib.repositories.PaymentRepository;
 import m3.lib.repositories.UserPointRepository;
 import m3.lib.repositories.UserRepository;
 import m3.lib.repositories.UserStuffRepository;
@@ -51,6 +53,7 @@ public class MapServiceImpl implements MapService {
     private final UserRepository userRepository;
     private final UserPointRepository userPointRepository;
     private final UserStuffRepository userStuffRepository;
+    private final PaymentRepository paymentRepository;
     private final CommonSender commonSender;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -230,6 +233,53 @@ public class MapServiceImpl implements MapService {
                 " теперь " + userStuff.toString(), ClientLogLevels.INFO, true);
 
         return stuffMapper.entityToDto(userStuff);
+    }
+
+    @Override
+    public DoOrderChangeCallbackAnswerRsDto doOrderChange(DoOrderChangeRqDto rq) {
+
+        //todo vkErrorItemPriceNotFonud if invalid data
+        //@todo vkErrorItemPriceNotfound if no product
+        ProductDto product = ShopStore.getGoldProductByPrice(rq.getItemPrice());
+
+        //@todo no user vkErrorCommon
+        UserEntity user = userRepository
+                .findBySocNetTypeIdAndSocNetUserId(rq.getSocNetType().getId(), rq.getReceiverId())
+                .orElseThrow(() -> new RuntimeException("vkErrorCommon"));
+
+        Optional<PaymentEntity> byId = paymentRepository.findById(rq.getOrderId());
+        if (byId.isPresent()) {
+            //Logs.log(buyPrefix + " tid:" + tid + " order already exists", Logs.LEVEL_WARN, arguments, Logs.TYPE_VK_PAYMENTS);
+            //@todo return vkErrorCommon
+            return null;
+        }
+
+
+        //@todo mapper
+        PaymentEntity entity = PaymentEntity.builder()
+                .orderId(rq.getOrderId())
+                .time(System.currentTimeMillis() / 1000L)
+                .userId(rq.getReceiverId())
+                .itemPrice(rq.getItemPrice())
+                .build();
+
+        PaymentEntity newOrder = paymentRepository.save(entity);
+
+        stuffService.giveAGold(user.getId(), product.getQuantity());
+
+        // send GotUserStuff
+
+        commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), rq.getItemPrice().toString());
+
+
+        VKOrderSuccess vkOrderSuccess = VKOrderSuccess.builder()
+                .response(VKOrderSuccessRepsponse.builder()
+                        .orderId(rq.getOrderId())
+                        .appOrderId(newOrder.getId())
+                        .build())
+                .build();
+
+        return null;
     }
 
     private static StatisticEnum getStatIdFromObjectId(ProductDto product) {

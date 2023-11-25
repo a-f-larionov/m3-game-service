@@ -3,10 +3,7 @@ package m3.gameplay.listeners;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import m3.gameplay.dto.rq.*;
-import m3.gameplay.dto.rs.GotMapInfoRsDto;
-import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
-import m3.gameplay.dto.rs.GotScoresRsDto;
-import m3.gameplay.dto.rs.GotStuffRsDto;
+import m3.gameplay.dto.rs.*;
 import m3.gameplay.services.MapService;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
@@ -98,5 +95,11 @@ public class TopicGamePlayKafkaListener {
     @SendTo("topic-client")
     public GotStuffRsDto usedShuffle(UsedShuffleRqDto rq) {
         return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_SHUFFLE);
+    }
+
+    @KafkaHandler
+    @SendTo("topic-client")
+    public DoOrderChangeCallbackAnswerRsDto doOrderChange(DoOrderChangeRqDto rq) {
+        return mapService.doOrderChange(rq);
     }
 }

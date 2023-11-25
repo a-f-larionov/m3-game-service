@@ -1,10 +1,8 @@
 package m3.gameplay.services;
 
 import m3.gameplay.dto.MapDto;
-import m3.gameplay.dto.rs.GotMapInfoRsDto;
-import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
-import m3.gameplay.dto.rs.GotScoresRsDto;
-import m3.gameplay.dto.rs.GotStuffRsDto;
+import m3.gameplay.dto.rq.DoOrderChangeRqDto;
+import m3.gameplay.dto.rs.*;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 
@@ -32,5 +30,7 @@ public interface MapService {
     GotStuffRsDto buyProduct(Long userId, Long index, ObjectEnum objectId);
 
     GotStuffRsDto spendMagic(Long userId, ObjectEnum objectId);
+
+    DoOrderChangeCallbackAnswerRsDto doOrderChange(DoOrderChangeRqDto rq);
 
 }
