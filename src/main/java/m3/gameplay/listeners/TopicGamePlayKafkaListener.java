@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import m3.gameplay.dto.rq.*;
 import m3.gameplay.dto.rs.*;
 import m3.gameplay.services.MapService;
+import m3.gameplay.services.PaymentService;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 import org.springframework.kafka.annotation.KafkaHandler;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 public class TopicGamePlayKafkaListener {
 
     private final MapService mapService;
+    private final PaymentService paymentService;
 
     @KafkaHandler
     @SendTo("topic-client")
@@ -100,7 +102,7 @@ public class TopicGamePlayKafkaListener {
     @KafkaHandler
     @SendTo("topic-client")
     public DoOrderChangeAnswerRsDto doOrderChange(DoOrderChangeRqDto rq) {
-        return mapService.doOrderChange(
+        return paymentService.doOrderChange(
                 rq.getTid(),
                 rq.getReceiverId(),
                 rq.getOrderId(),

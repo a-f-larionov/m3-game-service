@@ -38,3 +38,6 @@ socnet:
   vk:
     appId: ${VK_APP_ID}
     secretKey: ${VK_SECRET_KEY}
+
+server:
+  port: 8081

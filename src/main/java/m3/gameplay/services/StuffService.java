@@ -1,5 +1,7 @@
 package m3.gameplay.services;
 
+import m3.lib.entities.UserStuffEntity;
+
 public interface StuffService {
     void giveAHummer(Long userId, Long quantity);
 
@@ -16,4 +18,8 @@ public interface StuffService {
     void spendAShuffle(Long userId, Long quantity);
 
     void spendAGold(Long userId, Long quantity);
+
+    void sendToUser(Long userId);
+
+    UserStuffEntity getUserStuff(Long userId);
 }

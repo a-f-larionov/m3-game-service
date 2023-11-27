@@ -1,10 +1,12 @@
 package m3.gameplay.services;
 
 import m3.gameplay.dto.MapDto;
-import m3.gameplay.dto.rs.*;
+import m3.gameplay.dto.rs.GotMapInfoRsDto;
+import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
+import m3.gameplay.dto.rs.GotScoresRsDto;
+import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
-import m3.lib.enums.SocNetType;
 
 import java.util.List;
 
@@ -30,6 +32,4 @@ public interface MapService {
     GotStuffRsDto buyProduct(Long userId, Long index, ObjectEnum objectId);
 
     GotStuffRsDto spendMagic(Long userId, ObjectEnum objectId);
-
-    DoOrderChangeAnswerRsDto doOrderChange(Long tid, Long socNetUserId, Long extOrderId, Long itemPrice, SocNetType socNetType);
 }

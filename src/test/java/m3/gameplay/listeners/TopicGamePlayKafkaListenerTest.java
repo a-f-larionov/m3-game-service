@@ -3,6 +3,7 @@ package m3.gameplay.listeners;
 import m3.gameplay.dto.rq.*;
 import m3.gameplay.dto.rs.*;
 import m3.gameplay.services.MapService;
+import m3.gameplay.services.PaymentService;
 import m3.gameplay.store.MapStore;
 import m3.gameplay.store.PointStore;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
@@ -18,9 +19,9 @@ import static org.mockito.Mockito.*;
 
 class TopicGamePlayKafkaListenerTest {
 
-
     private final MapService mapService = mock(MapService.class);
-    private final TopicGamePlayKafkaListener gameplayListener = new TopicGamePlayKafkaListener(mapService);
+    private final PaymentService paymentService = mock(PaymentService.class);
+    private final TopicGamePlayKafkaListener gameplayListener = new TopicGamePlayKafkaListener(mapService, paymentService);
 
     @Test
     void sendMeMapInfoRqDto() {
@@ -313,7 +314,7 @@ class TopicGamePlayKafkaListenerTest {
         gameplayListener.doOrderChange(rq);
 
         // then
-        verify(mapService).doOrderChange(
+        verify(paymentService).doOrderChange(
                 eq(tid),
                 eq(socNetUserId),
                 eq(extOrderId),

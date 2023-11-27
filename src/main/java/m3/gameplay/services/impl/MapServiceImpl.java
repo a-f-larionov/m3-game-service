@@ -2,10 +2,10 @@ package m3.gameplay.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import m3.gameplay.dto.MapDto;
-import m3.gameplay.dto.rs.*;
-import m3.gameplay.dto.vk.rs.VKResponseDoOrderErrorRsDto;
-import m3.gameplay.dto.vk.rs.VKResponseDoOrderSuccessRsDto;
-import m3.lib.kafka.sender.CommonSender;
+import m3.gameplay.dto.rs.GotMapInfoRsDto;
+import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
+import m3.gameplay.dto.rs.GotScoresRsDto;
+import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.mappers.MapMapper;
 import m3.gameplay.mappers.PaymentMapper;
 import m3.gameplay.mappers.ScoreMapper;
@@ -17,15 +17,14 @@ import m3.gameplay.services.StuffService;
 import m3.gameplay.store.MapStore;
 import m3.lib.dto.ProductDto;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
-import m3.lib.entities.PaymentEntity;
 import m3.lib.entities.UserEntity;
 import m3.lib.entities.UserPointEntity;
 import m3.lib.entities.UserStuffEntity;
 import m3.lib.enums.ClientLogLevels;
 import m3.lib.enums.ObjectEnum;
-import m3.lib.enums.SocNetType;
 import m3.lib.enums.StatisticEnum;
 import m3.lib.helpers.UserHelper;
+import m3.lib.kafka.sender.CommonSender;
 import m3.lib.repositories.PaymentRepository;
 import m3.lib.repositories.UserPointRepository;
 import m3.lib.repositories.UserRepository;
@@ -58,28 +57,6 @@ public class MapServiceImpl implements MapService {
     private final PaymentRepository paymentRepository;
     private final CommonSender commonSender;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
-    private static final VKResponseDoOrderErrorRsDto vkErrorCommon = VKResponseDoOrderErrorRsDto
-            .builder()
-            .errorCode(1L)
-            .errorMsg("общая ошибка")
-            .crtitcal(false)
-            .build();
-
-    private static final VKResponseDoOrderErrorRsDto vkErrorItemPriceNotFound = VKResponseDoOrderErrorRsDto
-            .builder()
-            .errorCode(1L)
-            .errorMsg("нет такого товара")
-            .crtitcal(true)
-            .build();
-
-    private static final VKResponseDoOrderErrorRsDto vkErrorSign = VKResponseDoOrderErrorRsDto
-            .builder()
-            .errorCode(10L)
-            .errorMsg("несовпадение вычисленной и переданной подписи.")
-            .crtitcal(true)
-            .build();
-
 
     @Override
     public boolean existsMap(Long mapId) {
@@ -180,7 +157,7 @@ public class MapServiceImpl implements MapService {
             }
         });
 
-        sendStuffToUser(userId);
+        stuffService.sendToUser(userId);
 
         //@Todo transaction control!
         commonSender.statistic(userId, StatisticEnum.ID_OPEN_CHEST, chestId.toString());
@@ -189,7 +166,7 @@ public class MapServiceImpl implements MapService {
     @Override
     public GotStuffRsDto spendCoinsForTurns(Long userId) {
         var product = ShopStore.turnsUp;
-        var userStuff = getUserStuff(userId);
+        var userStuff = stuffService.getUserStuff(userId);
 
         decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.STUFF_GOLD);
 
@@ -202,7 +179,7 @@ public class MapServiceImpl implements MapService {
     @Override
     public UpdateUserInfoRsDto buyHealth(Long userId, Long index) {
         var userEntity = getUser(userId);
-        var userStuff = getUserStuff(userId);
+        var userStuff = stuffService.getUserStuff(userId);
 
         if (UserHelper.getHealths(userEntity) > 0) {
             commonSender.log(userId, "The user has more than zero lives.o", ClientLogLevels.WARN, true);
@@ -216,7 +193,8 @@ public class MapServiceImpl implements MapService {
         commonSender.log(userId, "Игрок " + userId + " купил жизней❤❤❤❤❤ " + userStuff, ClientLogLevels.INFO, true);
         commonSender.statistic(userId, ID_BUY_HEALTH);
 
-        sendStuffToUser(userId);
+        stuffService.sendToUser(userId);
+
         return mapMapper.entityToDto(userEntity);
     }
 
@@ -229,7 +207,7 @@ public class MapServiceImpl implements MapService {
     @Override
     public GotStuffRsDto buyProduct(Long userId, Long index, ObjectEnum objectId) {
         var product = ShopStore.getProduct(index, objectId);
-        UserStuffEntity userStuff = getUserStuff(userId);
+        UserStuffEntity userStuff = stuffService.getUserStuff(userId);
 
         decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.STUFF_GOLD);
         incrementStuff(userStuff, product);
@@ -248,7 +226,7 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public GotStuffRsDto spendMagic(Long userId, ObjectEnum objectId) {
-        var userStuff = getUserStuff(userId);
+        var userStuff = stuffService.getUserStuff(userId);
 
         decrementStuff(userStuff, 1L, objectId);
 
@@ -257,54 +235,6 @@ public class MapServiceImpl implements MapService {
                 " теперь " + userStuff.toString(), ClientLogLevels.INFO, true);
 
         return stuffMapper.entityToDto(userStuff);
-    }
-
-    @Override
-    public DoOrderChangeAnswerRsDto doOrderChange(Long tid, Long socNetUserId, Long extOrderId, Long itemPrice, SocNetType socNetType) {
-
-        if (!ShopStore.goldProductByPriceExists(itemPrice)) {
-            return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
-                    .response(vkErrorItemPriceNotFound)
-                    .build();
-        }
-
-        ProductDto product = ShopStore.getGoldProductByPrice(itemPrice);
-
-        var userOptional = userRepository.findBySocNetTypeIdAndSocNetUserId(socNetType.getId(), socNetUserId);
-        if (userOptional.isEmpty()) {
-            return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
-                    .response(vkErrorCommon)
-                    .build();
-        }
-        var user = userOptional.get();
-
-        Optional<PaymentEntity> payment = paymentRepository.findByOrderId(extOrderId);
-        if (payment.isPresent()) {
-            return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
-                    .response(vkErrorCommon)
-                    .build();
-        }
-
-
-        PaymentEntity entity = paymentMapper.toEntity(System.currentTimeMillis() / 1000L, user.getId(), extOrderId, itemPrice);
-        PaymentEntity newOrder = paymentRepository.save(entity);
-
-        stuffService.giveAGold(user.getId(), product.getQuantity());
-
-        sendStuffToUser(user.getId());
-
-        commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), itemPrice.toString());
-
-        return DoOrderChangeAnswerRsDto.builder()
-                .tid(tid)
-                .response(VKResponseDoOrderSuccessRsDto.builder()
-                        .orderId(extOrderId)
-                        .appOrderId(newOrder.getId())
-                        .build())
-                .build();
     }
 
     private static StatisticEnum getStatIdFromObjectId(ProductDto product) {
@@ -347,17 +277,5 @@ public class MapServiceImpl implements MapService {
             }
         }
         throw new RuntimeException("Not found stat for objectIdo");
-    }
-
-    private void sendStuffToUser(Long userId) {
-        var stuff = getUserStuff(userId);
-        GotStuffRsDto stuffRsDto = stuffMapper.entityToDto(stuff);
-        kafkaTemplate.send("topic-client", stuffRsDto);
-    }
-
-    private UserStuffEntity getUserStuff(Long userId) {
-        return userStuffRepository
-                .findById(userId)
-                .orElseThrow(() -> new RuntimeException("User stuff not found"));
     }
 }

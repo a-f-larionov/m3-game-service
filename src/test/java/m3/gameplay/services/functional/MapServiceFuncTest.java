@@ -7,6 +7,7 @@ import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.dto.rs.ScoreRsDto;
 import m3.gameplay.dto.vk.rs.VKResponseDoOrderSuccessRsDto;
 import m3.gameplay.services.MapService;
+import m3.gameplay.services.PaymentService;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 import m3.lib.enums.SocNetType;
@@ -37,6 +38,9 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
 
     @Autowired
     MapService mapService;
+
+    @Autowired
+    PaymentService paymentService;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -210,7 +214,7 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
         setUserStuff(userId, 100L, 10L, 20L, 30L);
 
         // when
-        var actualRs = mapService.doOrderChange(tid, socNetUserId, orderId, product.getPriceVotes(), socNetType);
+        var actualRs = paymentService.doOrderChange(tid, socNetUserId, orderId, product.getPriceVotes(), socNetType);
 
         // then
         var paymentId = paymentRepository.findByOrderId(orderId).get().getId();

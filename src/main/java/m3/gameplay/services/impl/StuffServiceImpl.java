@@ -1,8 +1,12 @@
 package m3.gameplay.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import m3.gameplay.dto.rs.GotStuffRsDto;
+import m3.gameplay.mappers.StuffMapper;
 import m3.gameplay.services.StuffService;
+import m3.lib.entities.UserStuffEntity;
 import m3.lib.repositories.UserStuffRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,6 +14,8 @@ import org.springframework.stereotype.Service;
 public class StuffServiceImpl implements StuffService {
 
     private final UserStuffRepository userStuffRepository;
+    private final StuffMapper stuffMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public void giveAGold(Long userId, Long qty) {
@@ -49,5 +55,19 @@ public class StuffServiceImpl implements StuffService {
     @Override
     public void spendAGold(Long userId, Long qty) {
         userStuffRepository.decrementGoldQty(userId, qty);
+    }
+
+    @Override
+    public void sendToUser(Long userId) {
+        var stuff = getUserStuff(userId);
+        GotStuffRsDto stuffRsDto = stuffMapper.entityToDto(stuff);
+        kafkaTemplate.send("topic-client", stuffRsDto);
+    }
+
+    @Override
+    public UserStuffEntity getUserStuff(Long userId) {
+        return userStuffRepository
+                .findById(userId)
+                .orElseThrow(() -> new RuntimeException("User stuff not found"));
     }
 }
