@@ -6,7 +6,7 @@ import m3.gameplay.dto.rs.GotPointTopScoreRsDto;
 import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.dto.rs.ScoreRsDto;
-import m3.gameplay.kafka.sender.CommonSender;
+import m3.lib.kafka.sender.CommonSender;
 import m3.gameplay.mappers.MapMapper;
 import m3.gameplay.mappers.PaymentMapper;
 import m3.gameplay.mappers.ScoreMapper;
@@ -45,7 +45,7 @@ class MapServiceImplTest {
     private final MapMapper mapMapper = mock(MapMapper.class);
     private final StuffMapper stuffMapper = mock(StuffMapper.class);
     private final ScoreMapper scoreMapper = mock(ScoreMapper.class);
-    private final PaymentMapper mapper = mock(PaymentMapper.class);
+    private final PaymentMapper paymentMapper = mock(PaymentMapper.class);
     private final UserRepository userRepository = mock(UserRepository.class);
     private final UserPointRepository userPointRepository = mock(UserPointRepository.class);
     private final UserStuffRepository userStuffRepository = mock(UserStuffRepository.class);
@@ -56,8 +56,8 @@ class MapServiceImplTest {
     private final MapService mapService = new MapServiceImpl(
 
             pointsService, chestsService, stuffService,
-            mapMapper, stuffMapper, scoreMapper, null,
-            userRepository, userPointRepository, userStuffRepository, null,
+            mapMapper, stuffMapper, scoreMapper, paymentMapper,
+            userRepository, userPointRepository, userStuffRepository, paymentRepository,
             commonSender,
             kafkaTemplate);
 

@@ -5,7 +5,7 @@ import m3.gameplay.dto.MapDto;
 import m3.gameplay.dto.rs.*;
 import m3.gameplay.dto.vk.rs.VKResponseDoOrderErrorRsDto;
 import m3.gameplay.dto.vk.rs.VKResponseDoOrderSuccessRsDto;
-import m3.gameplay.kafka.sender.CommonSender;
+import m3.lib.kafka.sender.CommonSender;
 import m3.gameplay.mappers.MapMapper;
 import m3.gameplay.mappers.PaymentMapper;
 import m3.gameplay.mappers.ScoreMapper;
@@ -59,21 +59,21 @@ public class MapServiceImpl implements MapService {
     private final CommonSender commonSender;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    private static VKResponseDoOrderErrorRsDto vkErrorCommon = VKResponseDoOrderErrorRsDto
+    private static final VKResponseDoOrderErrorRsDto vkErrorCommon = VKResponseDoOrderErrorRsDto
             .builder()
             .errorCode(1L)
             .errorMsg("общая ошибка")
             .crtitcal(false)
             .build();
 
-    private static VKResponseDoOrderErrorRsDto vkErrorItemPriceNotFound = VKResponseDoOrderErrorRsDto
+    private static final VKResponseDoOrderErrorRsDto vkErrorItemPriceNotFound = VKResponseDoOrderErrorRsDto
             .builder()
             .errorCode(1L)
             .errorMsg("нет такого товара")
             .crtitcal(true)
             .build();
 
-    private static VKResponseDoOrderErrorRsDto vkErrorSign = VKResponseDoOrderErrorRsDto
+    private static final VKResponseDoOrderErrorRsDto vkErrorSign = VKResponseDoOrderErrorRsDto
             .builder()
             .errorCode(10L)
             .errorMsg("несовпадение вычисленной и переданной подписи.")
@@ -213,7 +213,7 @@ public class MapServiceImpl implements MapService {
         userRepository.save(userEntity);
         userStuffRepository.save(userStuff);
 
-        commonSender.log(userId, "Игрок " + userId + " купил жизней❤❤❤❤❤ " + userStuff.toString(), ClientLogLevels.INFO, true);
+        commonSender.log(userId, "Игрок " + userId + " купил жизней❤❤❤❤❤ " + userStuff, ClientLogLevels.INFO, true);
         commonSender.statistic(userId, ID_BUY_HEALTH);
 
         sendStuffToUser(userId);
