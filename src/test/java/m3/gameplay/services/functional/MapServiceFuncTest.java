@@ -1,12 +1,16 @@
 package m3.gameplay.services.functional;
 
 import m3.gameplay.BaseSpringBootTest;
+import m3.gameplay.dto.rs.DoOrderChangeAnswerRsDto;
 import m3.gameplay.dto.rs.GotScoresRsDto;
 import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.dto.rs.ScoreRsDto;
+import m3.gameplay.dto.vk.rs.VKResponseDoOrderSuccessRsDto;
 import m3.gameplay.services.MapService;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
+import m3.lib.enums.SocNetType;
+import m3.lib.repositories.PaymentRepository;
 import m3.lib.repositories.UserRepository;
 import m3.lib.repositories.UserStuffRepository;
 import m3.lib.store.ShopStore;
@@ -41,6 +45,8 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
     UserStuffRepository userStuffRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Test
     void getScores() {
@@ -177,6 +183,56 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
         Map<String, Object> dbState = jdbcTemplate.queryForMap("SELECT * FROM users WHERE id = ?", userId);
         Long fullRecoveryTime = (Long) dbState.get("fullRecoveryTime");
         assertThat(fullRecoveryTime).isCloseTo(currenttime, Offset.offset(10L));
+    }
+
+    @Test
+    void doOrderChange() {
+        // given
+        Long tid = 10L;
+        Long socNetUserId = 110L;
+        Long orderId = 200L;
+        var product = ShopStore.gold.get(1);
+        SocNetType socNetType = SocNetType.VK;
+
+        var expectedRs = DoOrderChangeAnswerRsDto.builder()
+                .tid(tid)
+                .response(VKResponseDoOrderSuccessRsDto.builder()
+                        .orderId(orderId)
+                        .build())
+                .build();
+
+        deleteAllPayments();
+        deleteAllUsers();
+        jdbcTemplate.update("INSERT INTO users (socNetTypeId, socNetUserId) VALUES " +
+                "(?, ?)", socNetType.getId(), socNetUserId);
+        Long userId = (Long) jdbcTemplate.queryForMap("SELECT id FROM users WHERE socNetTypeId = ? AND socNetUserId = ? ", socNetType.getId(), socNetUserId).get("ID");
+
+        setUserStuff(userId, 100L, 10L, 20L, 30L);
+
+        // when
+        var actualRs = mapService.doOrderChange(tid, socNetUserId, orderId, product.getPriceVotes(), socNetType);
+
+        // then
+        var paymentId = paymentRepository.findByOrderId(orderId).get().getId();
+        VKResponseDoOrderSuccessRsDto response = (VKResponseDoOrderSuccessRsDto) (expectedRs.getResponse());
+        response.setAppOrderId(paymentId);
+
+        assertThat(actualRs)
+                .isEqualTo(expectedRs);
+        assertDbUserStuff(userId, 100L+product.getQuantity(), 10L, 20L, 30L);
+        assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), orderId);
+    }
+
+    private void assertDbPaymentOrder(Long id, Long userId, Long itemPrice, Long orderId) {
+        Map<String, Object> data = jdbcTemplate.queryForMap("SELECT * FROM payments WHERE id = ? ", id);
+        assertThat((Long) data.get("TIME")).isCloseTo(System.currentTimeMillis() / 1000, Offset.offset(10L));
+        assertThat((Long) data.get("USERID")).isEqualTo(userId);
+        assertThat((Long) data.get("ITEMPRICE")).isEqualTo(itemPrice);
+        assertThat((Long) data.get("ORDERID")).isEqualTo(orderId);
+    }
+
+    private void deleteAllPayments() {
+        jdbcTemplate.update("DELETE FROM payments WHERE id > 0");
     }
 
     private void deleteAllUsers() {

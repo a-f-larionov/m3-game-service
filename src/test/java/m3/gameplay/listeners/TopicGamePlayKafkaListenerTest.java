@@ -7,6 +7,7 @@ import m3.gameplay.store.MapStore;
 import m3.gameplay.store.PointStore;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
+import m3.lib.enums.SocNetType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -291,6 +292,34 @@ class TopicGamePlayKafkaListenerTest {
                 .isEqualTo(expectedRs);
         verify(mapService)
                 .spendMagic(userId, ObjectEnum.STUFF_SHUFFLE);
+    }
+
+    @Test
+    void doOrderChange() {
+        // given
+        var tid = 100L;
+        Long socNetUserId = 300L;
+        Long extOrderId = 200L;
+        Long itemPrice = 400L;
+        var rq = DoOrderChangeRqDto.builder()
+                .tid(tid)
+                .receiverId(socNetUserId)
+                .orderId(extOrderId)
+                .itemPrice(itemPrice)
+                .socNetType(SocNetType.VK)
+                .build();
+
+        // when
+        gameplayListener.doOrderChange(rq);
+
+        // then
+        verify(mapService).doOrderChange(
+                eq(tid),
+                eq(socNetUserId),
+                eq(extOrderId),
+                eq(itemPrice),
+                eq(SocNetType.VK)
+        );
     }
 
     private static GotStuffRsDto buildGotStuffRsDto(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {

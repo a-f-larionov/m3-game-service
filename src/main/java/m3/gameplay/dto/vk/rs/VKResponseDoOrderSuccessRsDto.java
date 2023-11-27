@@ -1,14 +1,15 @@
 package m3.gameplay.dto.vk.rs;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-@Builder
-@AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
 @Getter
-@ToString
+@Setter
 @EqualsAndHashCode
-public class VKOrderSuccessRepsponse {
+@ToString
+public class VKResponseDoOrderSuccessRsDto implements VKResponseDoOrderRsDto {
     private Long orderId;
     private Long appOrderId;
 }

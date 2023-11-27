@@ -99,7 +99,13 @@ public class TopicGamePlayKafkaListener {
 
     @KafkaHandler
     @SendTo("topic-client")
-    public DoOrderChangeCallbackAnswerRsDto doOrderChange(DoOrderChangeRqDto rq) {
-        return mapService.doOrderChange(rq);
+    public DoOrderChangeAnswerRsDto doOrderChange(DoOrderChangeRqDto rq) {
+        return mapService.doOrderChange(
+                rq.getTid(),
+                rq.getReceiverId(),
+                rq.getOrderId(),
+                rq.getItemPrice(),
+                rq.getSocNetType()
+        );
     }
 }

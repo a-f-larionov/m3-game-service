@@ -2,12 +2,12 @@ package m3.gameplay.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import m3.gameplay.dto.MapDto;
-import m3.gameplay.dto.rq.DoOrderChangeRqDto;
 import m3.gameplay.dto.rs.*;
-import m3.gameplay.dto.vk.rs.VKOrderSuccess;
-import m3.gameplay.dto.vk.rs.VKOrderSuccessRepsponse;
+import m3.gameplay.dto.vk.rs.VKResponseDoOrderErrorRsDto;
+import m3.gameplay.dto.vk.rs.VKResponseDoOrderSuccessRsDto;
 import m3.gameplay.kafka.sender.CommonSender;
 import m3.gameplay.mappers.MapMapper;
+import m3.gameplay.mappers.PaymentMapper;
 import m3.gameplay.mappers.ScoreMapper;
 import m3.gameplay.mappers.StuffMapper;
 import m3.gameplay.services.ChestsService;
@@ -23,6 +23,7 @@ import m3.lib.entities.UserPointEntity;
 import m3.lib.entities.UserStuffEntity;
 import m3.lib.enums.ClientLogLevels;
 import m3.lib.enums.ObjectEnum;
+import m3.lib.enums.SocNetType;
 import m3.lib.enums.StatisticEnum;
 import m3.lib.helpers.UserHelper;
 import m3.lib.repositories.PaymentRepository;
@@ -50,12 +51,35 @@ public class MapServiceImpl implements MapService {
     private final MapMapper mapMapper;
     private final StuffMapper stuffMapper;
     private final ScoreMapper scoreMapper;
+    private final PaymentMapper paymentMapper;
     private final UserRepository userRepository;
     private final UserPointRepository userPointRepository;
     private final UserStuffRepository userStuffRepository;
     private final PaymentRepository paymentRepository;
     private final CommonSender commonSender;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    private static VKResponseDoOrderErrorRsDto vkErrorCommon = VKResponseDoOrderErrorRsDto
+            .builder()
+            .errorCode(1L)
+            .errorMsg("общая ошибка")
+            .crtitcal(false)
+            .build();
+
+    private static VKResponseDoOrderErrorRsDto vkErrorItemPriceNotFound = VKResponseDoOrderErrorRsDto
+            .builder()
+            .errorCode(1L)
+            .errorMsg("нет такого товара")
+            .crtitcal(true)
+            .build();
+
+    private static VKResponseDoOrderErrorRsDto vkErrorSign = VKResponseDoOrderErrorRsDto
+            .builder()
+            .errorCode(10L)
+            .errorMsg("несовпадение вычисленной и переданной подписи.")
+            .crtitcal(true)
+            .build();
+
 
     @Override
     public boolean existsMap(Long mapId) {
@@ -76,7 +100,7 @@ public class MapServiceImpl implements MapService {
         // @todo user set to first positions
         var map = getById(mapId);
         var points = pointsService.getPointsByMapId(mapId);
-        return mapMapper.entitiestoRsDto(
+        return mapMapper.entitiesToRsDto(
                 userId,
                 mapId,
                 map,
@@ -236,50 +260,51 @@ public class MapServiceImpl implements MapService {
     }
 
     @Override
-    public DoOrderChangeCallbackAnswerRsDto doOrderChange(DoOrderChangeRqDto rq) {
+    public DoOrderChangeAnswerRsDto doOrderChange(Long tid, Long socNetUserId, Long extOrderId, Long itemPrice, SocNetType socNetType) {
 
-        //todo vkErrorItemPriceNotFonud if invalid data
-        //@todo vkErrorItemPriceNotfound if no product
-        ProductDto product = ShopStore.getGoldProductByPrice(rq.getItemPrice());
+        if (!ShopStore.goldProductByPriceExists(itemPrice)) {
+            return DoOrderChangeAnswerRsDto.builder()
+                    .tid(tid)
+                    .response(vkErrorItemPriceNotFound)
+                    .build();
+        }
 
-        //@todo no user vkErrorCommon
-        UserEntity user = userRepository
-                .findBySocNetTypeIdAndSocNetUserId(rq.getSocNetType().getId(), rq.getReceiverId())
-                .orElseThrow(() -> new RuntimeException("vkErrorCommon"));
+        ProductDto product = ShopStore.getGoldProductByPrice(itemPrice);
 
-        Optional<PaymentEntity> byId = paymentRepository.findById(rq.getOrderId());
-        if (byId.isPresent()) {
-            //Logs.log(buyPrefix + " tid:" + tid + " order already exists", Logs.LEVEL_WARN, arguments, Logs.TYPE_VK_PAYMENTS);
-            //@todo return vkErrorCommon
-            return null;
+        var userOptional = userRepository.findBySocNetTypeIdAndSocNetUserId(socNetType.getId(), socNetUserId);
+        if (userOptional.isEmpty()) {
+            return DoOrderChangeAnswerRsDto.builder()
+                    .tid(tid)
+                    .response(vkErrorCommon)
+                    .build();
+        }
+        var user = userOptional.get();
+
+        Optional<PaymentEntity> payment = paymentRepository.findByOrderId(extOrderId);
+        if (payment.isPresent()) {
+            return DoOrderChangeAnswerRsDto.builder()
+                    .tid(tid)
+                    .response(vkErrorCommon)
+                    .build();
         }
 
 
-        //@todo mapper
-        PaymentEntity entity = PaymentEntity.builder()
-                .orderId(rq.getOrderId())
-                .time(System.currentTimeMillis() / 1000L)
-                .userId(rq.getReceiverId())
-                .itemPrice(rq.getItemPrice())
-                .build();
-
+        PaymentEntity entity = paymentMapper.toEntity(System.currentTimeMillis() / 1000L, user.getId(), extOrderId, itemPrice);
         PaymentEntity newOrder = paymentRepository.save(entity);
 
         stuffService.giveAGold(user.getId(), product.getQuantity());
 
-        // send GotUserStuff
+        sendStuffToUser(user.getId());
 
-        commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), rq.getItemPrice().toString());
+        commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), itemPrice.toString());
 
-
-        VKOrderSuccess vkOrderSuccess = VKOrderSuccess.builder()
-                .response(VKOrderSuccessRepsponse.builder()
-                        .orderId(rq.getOrderId())
+        return DoOrderChangeAnswerRsDto.builder()
+                .tid(tid)
+                .response(VKResponseDoOrderSuccessRsDto.builder()
+                        .orderId(extOrderId)
                         .appOrderId(newOrder.getId())
                         .build())
                 .build();
-
-        return null;
     }
 
     private static StatisticEnum getStatIdFromObjectId(ProductDto product) {

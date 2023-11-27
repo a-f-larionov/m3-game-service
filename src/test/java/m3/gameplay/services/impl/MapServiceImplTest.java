@@ -8,6 +8,7 @@ import m3.gameplay.dto.rs.GotStuffRsDto;
 import m3.gameplay.dto.rs.ScoreRsDto;
 import m3.gameplay.kafka.sender.CommonSender;
 import m3.gameplay.mappers.MapMapper;
+import m3.gameplay.mappers.PaymentMapper;
 import m3.gameplay.mappers.ScoreMapper;
 import m3.gameplay.mappers.StuffMapper;
 import m3.gameplay.services.ChestsService;
@@ -19,6 +20,7 @@ import m3.lib.entities.UserPointEntity;
 import m3.lib.entities.UserStuffEntity;
 import m3.lib.entities.UsersPointId;
 import m3.lib.enums.StatisticEnum;
+import m3.lib.repositories.PaymentRepository;
 import m3.lib.repositories.UserPointRepository;
 import m3.lib.repositories.UserRepository;
 import m3.lib.repositories.UserStuffRepository;
@@ -43,15 +45,21 @@ class MapServiceImplTest {
     private final MapMapper mapMapper = mock(MapMapper.class);
     private final StuffMapper stuffMapper = mock(StuffMapper.class);
     private final ScoreMapper scoreMapper = mock(ScoreMapper.class);
+    private final PaymentMapper mapper = mock(PaymentMapper.class);
     private final UserRepository userRepository = mock(UserRepository.class);
     private final UserPointRepository userPointRepository = mock(UserPointRepository.class);
     private final UserStuffRepository userStuffRepository = mock(UserStuffRepository.class);
+    private final PaymentRepository paymentRepository = mock(PaymentRepository.class);
     private final CommonSender commonSender = mock(CommonSender.class);
     private final KafkaTemplate<String, Object> kafkaTemplate = mock(KafkaTemplate.class);
 
     private final MapService mapService = new MapServiceImpl(
 
-            pointsService, chestsService, stuffService, mapMapper, stuffMapper, scoreMapper, userRepository, userPointRepository, userStuffRepository, commonSender, kafkaTemplate);
+            pointsService, chestsService, stuffService,
+            mapMapper, stuffMapper, scoreMapper, null,
+            userRepository, userPointRepository, userStuffRepository, null,
+            commonSender,
+            kafkaTemplate);
 
     @Test
     void getScores() {

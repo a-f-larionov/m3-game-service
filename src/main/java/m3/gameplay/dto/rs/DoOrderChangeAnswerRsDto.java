@@ -3,6 +3,7 @@ package m3.gameplay.dto.rs;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import m3.gameplay.dto.vk.rs.VKResponseDoOrderRsDto;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -10,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class DoOrderChangeCallbackAnswerRsDto {
+public class DoOrderChangeAnswerRsDto {
     private Long tid;
-    private String body;
+    private VKResponseDoOrderRsDto response;
 }
