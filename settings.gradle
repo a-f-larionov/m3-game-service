@@ -1,1 +1,4 @@
 rootProject.name = 'm3-gameplay-service'
+
+include('m3-lib')
+project(":m3-lib").projectDir = new File('../m3-lib/')
