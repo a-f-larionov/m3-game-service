@@ -8,4 +8,6 @@ public interface PaymentService {
     DoOrderChangeAnswerRsDto doOrderChange(Long tid, Long socNetUserId, Long extOrderId, Long itemPrice, SocNetType socNetType);
 
     DoOrderChangeAnswerRsDto standaloneBuy(Long socNetUserId, Long orderId, Long itemPrice);
+
+    DoOrderChangeAnswerRsDto vkBuy();
 }

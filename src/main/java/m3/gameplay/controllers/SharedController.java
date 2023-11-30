@@ -14,16 +14,18 @@ public class SharedController {
 
     private final PaymentService paymentService;
 
-    @GetMapping("/do-some/")
-    public String doSome() {
-        return "do it!";
-    }
-
     @GetMapping("/service/standalone_buy")
     @ResponseBody
     public DoOrderChangeAnswerRsDto standaloneBuy(@RequestParam("receiver_id") Long socNetUserId,
                                                   @RequestParam("order_id") Long orderId,
                                                   @RequestParam("item_price") Long itemPrice) {
         return paymentService.standaloneBuy(socNetUserId, orderId, itemPrice);
+    }
+
+    @GetMapping("/service/vk_buy")
+    @ResponseBody
+    public DoOrderChangeAnswerRsDto vkBuy(){
+
+        return paymentService.vkBuy();
     }
 }

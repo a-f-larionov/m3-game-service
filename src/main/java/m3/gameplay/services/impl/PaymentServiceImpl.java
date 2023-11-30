@@ -132,4 +132,40 @@ public class PaymentServiceImpl implements PaymentService {
         return doOrderChange(tid, socNetUserId, orderId, itemPrice, SocNetType.Standalone);
     }
 
+    @Override
+    public DoOrderChangeAnswerRsDto vkBuy(){
+
+//        /**
+//         * @see https://vk.com/dev/payments_callbacks?f=3.%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D0%B8
+//         * @param callback
+//         * @param request
+//         * @constructor
+//         */
+//        this.VKbuy = function (callback, request) {
+//            let body = '', buyPrefix = 'vk_buy';
+//            let tid;
+//            tid = getOne();
+//
+//            Logs.log(buyPrefix + " REQUEST", Logs.LEVEL_TRACE, undefined, Logs.TYPE_VK_PAYMENTS);
+//
+//            /** Собираем тело */
+//            request.on('data', function (data) {
+//                body += data;
+//            });
+//
+//            /** Завершили сбор тела */
+//            request.on('end', function () {
+//                onVKbuyReady(
+//                        request.url,
+//                        body,
+//                        QUERYSTRING.decode(body),
+//                        tid,
+//                        callback,
+//                        buyPrefix
+//                );
+//            });
+//        };
+        return  null;
+    }
+
 }
