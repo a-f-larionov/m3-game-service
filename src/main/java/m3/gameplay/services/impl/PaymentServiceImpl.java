@@ -15,10 +15,14 @@ import m3.lib.kafka.sender.CommonSender;
 import m3.lib.repositories.PaymentRepository;
 import m3.lib.repositories.UserRepository;
 import m3.lib.store.ShopStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static m3.lib.enums.StatisticEnum.ID_BUY_VK_MONEY;
@@ -36,6 +40,10 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final StuffService stuffService;
     private final CommonSender commonSender;
+    @Value("${socnet.vk.appId}")
+    private Long vkAppId;
+    @Value("${VK_SECRET_KEY}")
+    private String vkSecretKey;
 
     private static final VKResponseDoOrderErrorRsDto vkErrorCommon = VKResponseDoOrderErrorRsDto
             .builder()
@@ -132,40 +140,71 @@ public class PaymentServiceImpl implements PaymentService {
         return doOrderChange(tid, socNetUserId, orderId, itemPrice, SocNetType.Standalone);
     }
 
+    /**
+     * @see <a href="https://vk.com/dev/payments_callbacks?f=3.%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D0%B8">VK dev doc</a>
+     */
     @Override
-    public DoOrderChangeAnswerRsDto vkBuy(){
+    public DoOrderChangeAnswerRsDto vkBuy(Long appId, Long socNetUserId, String sig, Long orderId,
+                                          Long itemPrice, String notificationType, String status, Map<String, String> params) {
+        Long tid = lastTid++;
 
-//        /**
-//         * @see https://vk.com/dev/payments_callbacks?f=3.%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D0%B8
-//         * @param callback
-//         * @param request
-//         * @constructor
-//         */
-//        this.VKbuy = function (callback, request) {
-//            let body = '', buyPrefix = 'vk_buy';
-//            let tid;
-//            tid = getOne();
-//
-//            Logs.log(buyPrefix + " REQUEST", Logs.LEVEL_TRACE, undefined, Logs.TYPE_VK_PAYMENTS);
-//
-//            /** Собираем тело */
-//            request.on('data', function (data) {
-//                body += data;
-//            });
-//
-//            /** Завершили сбор тела */
-//            request.on('end', function () {
-//                onVKbuyReady(
-//                        request.url,
-//                        body,
-//                        QUERYSTRING.decode(body),
-//                        tid,
-//                        callback,
-//                        buyPrefix
-//                );
-//            });
-//        };
-        return  null;
+        commonSender.log(null,
+                format("Standalone pay request incoming: \r\n" +
+                                "socNetUserId: %s orderId: %s itemPrice: %s",
+                        socNetUserId, orderId, itemPrice),
+                ClientLogLevels.INFO, true);
+
+        //@todo write to file
+        //@todo validate, every field is not null
+        //@todo return vkErrorCommon on validate error
+        //@todo convert to DTO, and DTO on @GetMapping request!
+
+        if (!vkAppId.equals(appId)) {
+            commonSender.log(null, "Wrong appId. " + appId, ClientLogLevels.WARN, true);
+            return buildVKErrorCommon(tid);
+        }
+
+        if (checkVKSign(sig, params)) {
+            commonSender.log(null, "Wrong signature. " + sig, ClientLogLevels.WARN, true);
+            return DoOrderChangeAnswerRsDto.builder()
+                    .response(vkErrorSign)
+                    .tid(tid)
+                    .build();
+        }
+
+        if (notificationType.equals("order_status_change") || notificationType.equals("order_status_change_test")) {
+            if (!sig.equals("chargeable")) {
+                commonSender.log(null, "Wrong status. " + status, ClientLogLevels.WARN, true);
+                return buildVKErrorCommon(tid);
+            } else {
+                return doOrderChange(tid, socNetUserId, orderId, itemPrice, SocNetType.VK);
+            }
+        } else {
+            commonSender.log(null, "Wrotn notification type. " + status, ClientLogLevels.WARN, true);
+            return buildVKErrorCommon(tid);
+        }
     }
 
+    private boolean checkVKSign(String sig, Map<String, String> params) {
+        return sig.equals(calcVKSign(params));
+    }
+
+    private String calcVKSign(Map<String, String> params) {
+        return DigestUtils.md5DigestAsHex(
+                (params.keySet()
+                        .stream()
+                        .filter(key -> !key.equals("sig"))
+                        .sorted()
+                        .map(k -> k + "=" + params.get(k))
+                        .collect(Collectors.joining(""))
+                        + vkSecretKey)
+                        .getBytes());
+    }
+
+    private DoOrderChangeAnswerRsDto buildVKErrorCommon(Long tid) {
+        return DoOrderChangeAnswerRsDto.builder()
+                .response(vkErrorCommon)
+                .tid(tid)
+                .build();
+    }
 }
