@@ -42,7 +42,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final CommonSender commonSender;
     @Value("${socnet.vk.appId}")
     private Long vkAppId;
-    @Value("${VK_SECRET_KEY}")
+    @Value("${socnet.vk.secretKey}")
     private String vkSecretKey;
 
     private static final VKResponseDoOrderErrorRsDto vkErrorCommon = VKResponseDoOrderErrorRsDto
@@ -145,8 +145,17 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public DoOrderChangeAnswerRsDto vkBuy(Long appId, Long socNetUserId, String sig, Long orderId,
-                                          Long itemPrice, String notificationType, String status, Map<String, String> params) {
+                                          Long itemPrice, String notificationType, String status) {
         Long tid = lastTid++;
+        //@todo how do it by one string from getParams\or may be Post?
+        Map<String, String> params = Map.of(
+                "app_id", appId.toString(),
+                "receiver_id", socNetUserId.toString(),
+                "sig", sig,
+                "order_id", orderId.toString(),
+                "item_price", itemPrice.toString(),
+                "notification_type", notificationType,
+                "status", status);
 
         commonSender.log(null,
                 format("Standalone pay request incoming: \r\n" +
