@@ -67,67 +67,6 @@ public class PaymentServiceImpl implements PaymentService {
             .build();
 
     @Override
-    public DoOrderChangeAnswerRsDto doOrderChange(Long tid, Long socNetUserId, Long extOrderId, Long itemPrice, SocNetType socNetType) {
-
-        var userOptional = userRepository.findBySocNetTypeIdAndSocNetUserId(socNetType.getId(), socNetUserId);
-        if (userOptional.isEmpty()) {
-            commonSender.log(null, format("Order failed. Not user found.:\r\n" +
-                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, "-", extOrderId, "-"),
-                    ClientLogLevels.INFO, true);
-            return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
-                    .response(vkErrorCommon)
-                    .build();
-        }
-        var user = userOptional.get();
-
-        if (!ShopStore.goldProductByPriceExists(itemPrice)) {
-            commonSender.log(null, format("Order failed. Not product found.:\r\n" +
-                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, "-"),
-                    ClientLogLevels.INFO, true);
-            return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
-                    .response(vkErrorItemPriceNotFound)
-                    .build();
-        }
-
-        ProductDto product = ShopStore.getGoldProductByPrice(itemPrice);
-
-        Optional<PaymentEntity> payment = paymentRepository.findByOrderId(extOrderId);
-        if (payment.isPresent()) {
-            commonSender.log(null, format("Order failed. Not user found.:\r\n" +
-                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, payment.get().getId()),
-                    ClientLogLevels.INFO, true);
-            return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
-                    .response(vkErrorCommon)
-                    .build();
-        }
-
-        //@todo transaction analyzing. payment saved, but user stuff throw exception!
-        PaymentEntity entity = paymentMapper.toEntity(System.currentTimeMillis() / 1000L, user.getId(), extOrderId, itemPrice);
-        PaymentEntity newOrder = paymentRepository.save(entity);
-
-        stuffService.giveAGold(user.getId(), product.getQuantity());
-
-        stuffService.sendToUser(user.getId());
-
-        commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), itemPrice.toString());
-        //@todo write to file necessary
-        commonSender.log(user.getId(), format("Order successed:\r\n" +
-                        "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, newOrder.getId()),
-                ClientLogLevels.INFO, true);
-
-        return DoOrderChangeAnswerRsDto.builder()
-                .tid(tid)
-                .response(VKResponseDoOrderSuccessRsDto.builder()
-                        .orderId(extOrderId)
-                        .appOrderId(newOrder.getId())
-                        .build())
-                .build();
-    }
-
-    @Override
     public DoOrderChangeAnswerRsDto standaloneBuy(Long socNetUserId, Long orderId, Long itemPrice) {
         var tid = lastTid++;
 
@@ -192,6 +131,67 @@ public class PaymentServiceImpl implements PaymentService {
             commonSender.log(null, "Wrotn notification type. " + status, ClientLogLevels.WARN, true);
             return buildVKErrorCommon(tid);
         }
+    }
+
+    @Override
+    public DoOrderChangeAnswerRsDto doOrderChange(Long tid, Long socNetUserId, Long extOrderId, Long itemPrice, SocNetType socNetType) {
+
+        var userOptional = userRepository.findBySocNetTypeIdAndSocNetUserId(socNetType.getId(), socNetUserId);
+        if (userOptional.isEmpty()) {
+            commonSender.log(null, format("Order failed. Not user found.:\r\n" +
+                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, "-", extOrderId, "-"),
+                    ClientLogLevels.INFO, true);
+            return DoOrderChangeAnswerRsDto.builder()
+                    .tid(tid)
+                    .response(vkErrorCommon)
+                    .build();
+        }
+        var user = userOptional.get();
+
+        if (!ShopStore.goldProductByPriceExists(itemPrice)) {
+            commonSender.log(null, format("Order failed. Not product found.:\r\n" +
+                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, "-"),
+                    ClientLogLevels.INFO, true);
+            return DoOrderChangeAnswerRsDto.builder()
+                    .tid(tid)
+                    .response(vkErrorItemPriceNotFound)
+                    .build();
+        }
+
+        ProductDto product = ShopStore.getGoldProductByPrice(itemPrice);
+
+        Optional<PaymentEntity> payment = paymentRepository.findByOrderId(extOrderId);
+        if (payment.isPresent()) {
+            commonSender.log(null, format("Order failed. Not user found.:\r\n" +
+                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, payment.get().getId()),
+                    ClientLogLevels.INFO, true);
+            return DoOrderChangeAnswerRsDto.builder()
+                    .tid(tid)
+                    .response(vkErrorCommon)
+                    .build();
+        }
+
+        //@todo transaction analyzing. payment saved, but user stuff throw exception!
+        PaymentEntity entity = paymentMapper.toEntity(System.currentTimeMillis() / 1000L, user.getId(), extOrderId, itemPrice);
+        PaymentEntity newOrder = paymentRepository.save(entity);
+
+        stuffService.giveAGold(user.getId(), product.getQuantity());
+
+        stuffService.sendToUser(user.getId());
+
+        commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), itemPrice.toString());
+        //@todo write to file necessary
+        commonSender.log(user.getId(), format("Order successed:\r\n" +
+                        "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, newOrder.getId()),
+                ClientLogLevels.INFO, true);
+
+        return DoOrderChangeAnswerRsDto.builder()
+                .tid(tid)
+                .response(VKResponseDoOrderSuccessRsDto.builder()
+                        .orderId(extOrderId)
+                        .appOrderId(newOrder.getId())
+                        .build())
+                .build();
     }
 
     private boolean checkVKSign(String sig, Map<String, String> params) {

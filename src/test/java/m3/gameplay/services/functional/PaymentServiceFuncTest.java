@@ -64,8 +64,42 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
 
         assertThat(actualRs)
                 .isEqualTo(expectedRs);
-        assertDbUserStuff(userId, 100L+product.getQuantity(), 10L, 20L, 30L);
+        assertDbUserStuff(userId, 100L + product.getQuantity(), 10L, 20L, 30L);
         assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), orderId);
+    }
+
+    @Test
+    public void standaloneBuy() {
+        // given
+        Long itemPrice = 1L; //
+        var product = ShopStore.getGoldProductByPrice(itemPrice);
+        Long socNetUserId = 100L;
+        Long orderId = 123L;
+
+        // when
+        paymentService.standaloneBuy(socNetUserId, orderId, itemPrice);
+
+        // then
+
+    }
+
+    @Test
+    public void vkBuy() {
+        // given
+        Long itemPrice = 1L; //
+        var product = ShopStore.getGoldProductByPrice(itemPrice);
+        Long appId = 1234L;
+        Long socNetUserId = 100L;
+        Long orderId = 123L;
+        String status = "recharcheagle";
+        String notificationType = "notification type";
+        String sig = "some sign here";
+
+        // when
+        paymentService.vkBuy(appId, socNetUserId, sig, orderId, itemPrice, notificationType, status);
+
+        // then
+
     }
 
     private Long createUserPartially(SocNetType socNetType, Long socNetUserId) {
