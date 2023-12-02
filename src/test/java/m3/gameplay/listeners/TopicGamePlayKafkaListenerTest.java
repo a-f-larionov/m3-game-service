@@ -316,10 +316,10 @@ class TopicGamePlayKafkaListenerTest {
         // then
         verify(paymentService).doOrderChange(
                 eq(tid),
+                eq(SocNetType.VK),
                 eq(socNetUserId),
-                eq(extOrderId),
                 eq(itemPrice),
-                eq(SocNetType.VK)
+                eq(extOrderId)
         );
     }
 

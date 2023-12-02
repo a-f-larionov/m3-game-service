@@ -104,10 +104,10 @@ public class TopicGamePlayKafkaListener {
     public DoOrderChangeAnswerRsDto doOrderChange(DoOrderChangeRqDto rq) {
         return paymentService.doOrderChange(
                 rq.getTid(),
+                rq.getSocNetType(),
                 rq.getReceiverId(),
-                rq.getOrderId(),
                 rq.getItemPrice(),
-                rq.getSocNetType()
+                rq.getOrderId()
         );
     }
 }

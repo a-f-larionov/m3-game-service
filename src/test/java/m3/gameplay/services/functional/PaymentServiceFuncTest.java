@@ -35,74 +35,104 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
     @Test
     void doOrderChange() {
         // given
-        Long tid = 10L;
-        Long socNetUserId = 110L;
-        Long orderId = 200L;
+        var reqId = 10L;
+        var socNetType = SocNetType.VK;
+        var socNetUserId = 110L;
         var product = ShopStore.gold.get(1);
-        SocNetType socNetType = SocNetType.VK;
+        var extOrderId = 200L;
 
-        var expectedRs = DoOrderChangeAnswerRsDto.builder()
+        var expectedRs = buildDoOrderChangeRsDto(reqId, extOrderId);
+
+        dbDeleteAllUsers();
+        dbDeleteAllPayments();
+        var userId = dbCreateUser(socNetType, socNetUserId);
+        dbSetUserStuff(userId, 0L, 10L, 20L, 30L);
+
+
+        // when
+        var actualRs = paymentService.doOrderChange(reqId, socNetType, socNetUserId, product.getPriceVotes(), extOrderId);
+
+        // then
+        var paymentId = paymentRepository.findByOrderId(extOrderId).get().getId();
+        ((VKResponseDoOrderSuccessRsDto) (expectedRs.getResponse())).setAppOrderId(paymentId);
+
+        assertThat(actualRs).isEqualTo(expectedRs);
+        assertDbUserStuff(userId, product.getQuantity(), 10L, 20L, 30L);
+        assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), extOrderId);
+    }
+
+    private static DoOrderChangeAnswerRsDto buildDoOrderChangeRsDto(Long tid, Long orderId) {
+        return DoOrderChangeAnswerRsDto.builder()
                 .tid(tid)
                 .response(VKResponseDoOrderSuccessRsDto.builder()
                         .orderId(orderId)
                         .build())
                 .build();
-
-        deleteAllUsers();
-        deleteAllPayments();
-
-        Long userId = createUserPartially(socNetType, socNetUserId);
-        setUserStuff(userId, 100L, 10L, 20L, 30L);
-
-        // when
-        var actualRs = paymentService.doOrderChange(tid, socNetUserId, orderId, product.getPriceVotes(), socNetType);
-
-        // then
-        var paymentId = paymentRepository.findByOrderId(orderId).get().getId();
-        VKResponseDoOrderSuccessRsDto response = (VKResponseDoOrderSuccessRsDto) (expectedRs.getResponse());
-        response.setAppOrderId(paymentId);
-
-        assertThat(actualRs)
-                .isEqualTo(expectedRs);
-        assertDbUserStuff(userId, 100L + product.getQuantity(), 10L, 20L, 30L);
-        assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), orderId);
     }
 
     @Test
     public void standaloneBuy() {
         // given
-        Long itemPrice = 1L; //
-        var product = ShopStore.getGoldProductByPrice(itemPrice);
-        Long socNetUserId = 100L;
-        Long orderId = 123L;
+        var reqId = 1L;
+        var socNetType = SocNetType.Standalone;
+        var socNetUserId = 120L;
+        var product = ShopStore.gold.get(2);
+        var extOrderId = 200L;
+
+        var expectedRs = buildDoOrderChangeRsDto(reqId, extOrderId);
+
+        dbDeleteAllUsers();
+        dbDeleteAllPayments();
+        var userId = dbCreateUser(socNetType, socNetUserId);
+        dbSetUserStuff(userId, 0L, 100L, 200L, 300L);
 
         // when
-        paymentService.standaloneBuy(socNetUserId, orderId, itemPrice);
+        var actualRs = paymentService.standaloneBuy(socNetUserId, product.getPriceVotes(), extOrderId);
 
         // then
+        var paymentId = paymentRepository.findByOrderId(extOrderId).get().getId();
+        ((VKResponseDoOrderSuccessRsDto) (expectedRs.getResponse())).setAppOrderId(paymentId);
 
+        assertThat(actualRs.getTid()).isCloseTo(10L, Offset.offset(10L));
+        assertThat(actualRs.getResponse()).isEqualTo(expectedRs.getResponse());
+        assertDbUserStuff(userId, product.getQuantity(), 10L, 20L, 30L);
+        assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), extOrderId);
     }
 
     @Test
     public void vkBuy() {
         // given
-        Long itemPrice = 1L; //
-        var product = ShopStore.getGoldProductByPrice(itemPrice);
-        Long appId = 1234L;
-        Long socNetUserId = 100L;
-        Long orderId = 123L;
-        String status = "recharcheagle";
-        String notificationType = "notification type";
-        String sig = "some sign here";
+        var appId = 123456789L;
+        var sig = "signature";
+        var reqId = 1L;
+        var socNetType = SocNetType.VK;
+        var socNetUserId = 120L;
+        var product = ShopStore.gold.get(2);
+        var extOrderId = 200L;
+        var notificationType = "order_status_change_test";
+        var status = "chargeable";
+
+        var expectedRs = buildDoOrderChangeRsDto(reqId, extOrderId);
+
+        dbDeleteAllUsers();
+        dbDeleteAllPayments();
+        var userId = dbCreateUser(socNetType, socNetUserId);
+        dbSetUserStuff(userId, 0L, 10L, 20L, 30L);
 
         // when
-        paymentService.vkBuy(appId, socNetUserId, sig, orderId, itemPrice, notificationType, status);
+        var actualRs = paymentService.vkBuy(appId, socNetUserId, sig, product.getPriceVotes(), extOrderId, notificationType, status);
 
         // then
+        var paymentId = paymentRepository.findByOrderId(extOrderId).get().getId();
+        ((VKResponseDoOrderSuccessRsDto) (expectedRs.getResponse())).setAppOrderId(paymentId);
 
+        assertThat(actualRs.getTid()).isCloseTo(10L, Offset.offset(10L));
+        assertThat(actualRs.getResponse()).isEqualTo(expectedRs.getResponse());
+        assertDbUserStuff(userId, product.getQuantity(), 10L, 20L, 30L);
+        assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), extOrderId);
     }
 
-    private Long createUserPartially(SocNetType socNetType, Long socNetUserId) {
+    private Long dbCreateUser(SocNetType socNetType, Long socNetUserId) {
         jdbcTemplate.update("INSERT INTO users (socNetTypeId, socNetUserId) VALUES " +
                 "(?, ?)", socNetType.getId(), socNetUserId);
         Long userId = (Long) jdbcTemplate.queryForMap("SELECT id FROM users WHERE socNetTypeId = ? AND socNetUserId = ? ", socNetType.getId(), socNetUserId).get("ID");
@@ -126,15 +156,15 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
         assertThat((Long) data.get("ORDERID")).isEqualTo(orderId);
     }
 
-    private void deleteAllPayments() {
+    private void dbDeleteAllPayments() {
         jdbcTemplate.update("DELETE FROM payments WHERE id > 0");
     }
 
-    private void deleteAllUsers() {
+    private void dbDeleteAllUsers() {
         jdbcTemplate.update("DELETE FROM users WHERE create_tm IS NOT NULL OR create_tm IS NULL");
     }
 
-    private void setUserStuff(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
+    private void dbSetUserStuff(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
         jdbcTemplate.update("DELETE FROM users_stuff WHERE userId = ?", userId);
         jdbcTemplate.update("INSERT INTO users_stuff (userId, goldQty, hummerQty, lightningQty, shuffleQty) " +
                 "VALUE (?, ? ,? ,? ,?)", userId, gold, hummer, lightning, shuffle);

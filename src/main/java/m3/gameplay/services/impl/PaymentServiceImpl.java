@@ -33,7 +33,7 @@ import static m3.lib.enums.StatisticEnum.ID_BUY_VK_MONEY;
 public class PaymentServiceImpl implements PaymentService {
 
     //@todo thread safe counter!
-    private static Long lastTid = 0L;
+    private static Long lastTid = 1L;
 
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
@@ -67,24 +67,25 @@ public class PaymentServiceImpl implements PaymentService {
             .build();
 
     @Override
-    public DoOrderChangeAnswerRsDto standaloneBuy(Long socNetUserId, Long orderId, Long itemPrice) {
+    public DoOrderChangeAnswerRsDto standaloneBuy(Long socNetUserId, Long itemPrice, Long extOrderId) {
         var tid = lastTid++;
 
         commonSender.log(null,
                 format("Standalone pay request incoming: \r\n" +
-                                "socNetUserId: %s orderId: %s itemPrice: %s",
-                        socNetUserId, orderId, itemPrice),
+                                "socNetUserId: %s extOrderId: %s itemPrice: %s",
+                        socNetUserId, extOrderId, itemPrice),
                 ClientLogLevels.INFO, true);
 
-        return doOrderChange(tid, socNetUserId, orderId, itemPrice, SocNetType.Standalone);
+        return doOrderChange(tid, SocNetType.Standalone, socNetUserId, itemPrice, extOrderId);
     }
 
     /**
      * @see <a href="https://vk.com/dev/payments_callbacks?f=3.%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D0%B8">VK dev doc</a>
      */
     @Override
-    public DoOrderChangeAnswerRsDto vkBuy(Long appId, Long socNetUserId, String sig, Long orderId,
-                                          Long itemPrice, String notificationType, String status) {
+    public DoOrderChangeAnswerRsDto vkBuy(Long appId, Long socNetUserId, String sig,
+                                          Long itemPrice, Long orderId,
+                                          String notificationType, String status) {
         Long tid = lastTid++;
         //@todo how do it by one string from getParams\or may be Post?
         Map<String, String> params = Map.of(
@@ -121,28 +122,28 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         if (notificationType.equals("order_status_change") || notificationType.equals("order_status_change_test")) {
-            if (!sig.equals("chargeable")) {
+            if (!status.equals("chargeable")) {
                 commonSender.log(null, "Wrong status. " + status, ClientLogLevels.WARN, true);
                 return buildVKErrorCommon(tid);
             } else {
-                return doOrderChange(tid, socNetUserId, orderId, itemPrice, SocNetType.VK);
+                return doOrderChange(tid, SocNetType.VK, socNetUserId, itemPrice, orderId);
             }
         } else {
-            commonSender.log(null, "Wrotn notification type. " + status, ClientLogLevels.WARN, true);
+            commonSender.log(null, "Wrong notification type. " + status, ClientLogLevels.WARN, true);
             return buildVKErrorCommon(tid);
         }
     }
 
     @Override
-    public DoOrderChangeAnswerRsDto doOrderChange(Long tid, Long socNetUserId, Long extOrderId, Long itemPrice, SocNetType socNetType) {
+    public DoOrderChangeAnswerRsDto doOrderChange(Long reqId, SocNetType socNetType, Long socNetUserId, Long itemPrice, Long extOrderId) {
 
         var userOptional = userRepository.findBySocNetTypeIdAndSocNetUserId(socNetType.getId(), socNetUserId);
         if (userOptional.isEmpty()) {
             commonSender.log(null, format("Order failed. Not user found.:\r\n" +
-                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, "-", extOrderId, "-"),
+                            "reqId: %s, userId: %s, orderId: %s, appOrderId: %s", reqId, "-", extOrderId, "-"),
                     ClientLogLevels.INFO, true);
             return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
+                    .tid(reqId)
                     .response(vkErrorCommon)
                     .build();
         }
@@ -150,10 +151,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (!ShopStore.goldProductByPriceExists(itemPrice)) {
             commonSender.log(null, format("Order failed. Not product found.:\r\n" +
-                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, "-"),
+                            "reqId: %s, userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, "-"),
                     ClientLogLevels.INFO, true);
             return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
+                    .tid(reqId)
                     .response(vkErrorItemPriceNotFound)
                     .build();
         }
@@ -163,10 +164,10 @@ public class PaymentServiceImpl implements PaymentService {
         Optional<PaymentEntity> payment = paymentRepository.findByOrderId(extOrderId);
         if (payment.isPresent()) {
             commonSender.log(null, format("Order failed. Not user found.:\r\n" +
-                            "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, payment.get().getId()),
+                            "reqId: %s, userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, payment.get().getId()),
                     ClientLogLevels.INFO, true);
             return DoOrderChangeAnswerRsDto.builder()
-                    .tid(tid)
+                    .tid(reqId)
                     .response(vkErrorCommon)
                     .build();
         }
@@ -182,11 +183,11 @@ public class PaymentServiceImpl implements PaymentService {
         commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), itemPrice.toString());
         //@todo write to file necessary
         commonSender.log(user.getId(), format("Order successed:\r\n" +
-                        "tid: %s, userId: %s, orderId: %s, appOrderId: %s", tid, user.getId(), extOrderId, newOrder.getId()),
+                        "reqId: %s, userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, newOrder.getId()),
                 ClientLogLevels.INFO, true);
 
         return DoOrderChangeAnswerRsDto.builder()
-                .tid(tid)
+                .tid(reqId)
                 .response(VKResponseDoOrderSuccessRsDto.builder()
                         .orderId(extOrderId)
                         .appOrderId(newOrder.getId())
