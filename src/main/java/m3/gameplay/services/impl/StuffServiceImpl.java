@@ -66,6 +66,8 @@ public class StuffServiceImpl implements StuffService {
 
     @Override
     public UserStuffEntity getUserStuff(Long userId) {
+        System.out.println(userId);
+        System.out.println(userStuffRepository.findById(userId));
         return userStuffRepository
                 .findById(userId)
                 .orElseThrow(() -> new RuntimeException("User stuff not found"));

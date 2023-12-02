@@ -93,8 +93,8 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public void onFinish(Long userId, Long pointId, Long score, Long chestId) {
-        // @todo transactional one for all method
-        getUser(userId);
+        // @todo transactional one for all methods
+        checkUserExits(userId);
 
         updateUserPoint(userId, pointId, score);
         nextPointUp(userId, pointId);
@@ -134,7 +134,6 @@ public class MapServiceImpl implements MapService {
     private void updateUserPoint(Long userId, Long pointId, Long score) {
         commonSender.statistic(userId, StatisticEnum.ID_FINISH_PLAY, pointId.toString(), score.toString());
         userPointRepository.updateUserPoint(userId, pointId, score);
-        //     TopScoreCache.flush(cntx.user.id, pointId);
     }
 
     private void nextPointUp(Long userId, Long pointId) {
@@ -167,7 +166,7 @@ public class MapServiceImpl implements MapService {
     public GotStuffRsDto spendCoinsForTurns(Long userId) {
         var product = ShopStore.turnsUp;
         var userStuff = stuffService.getUserStuff(userId);
-
+        System.out.println(userStuff);
         decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.STUFF_GOLD);
 
         userStuffRepository.save(userStuff);
@@ -178,7 +177,7 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public UpdateUserInfoRsDto buyHealth(Long userId, Long index) {
-        var userEntity = getUser(userId);
+        var userEntity = getUserById(userId);
         var userStuff = stuffService.getUserStuff(userId);
 
         if (UserHelper.getHealths(userEntity) > 0) {
@@ -196,12 +195,6 @@ public class MapServiceImpl implements MapService {
         stuffService.sendToUser(userId);
 
         return mapMapper.entityToDto(userEntity);
-    }
-
-    private UserEntity getUser(Long userId) {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found."));
     }
 
     @Override
@@ -256,6 +249,7 @@ public class MapServiceImpl implements MapService {
     }
 
     private static void decrementStuff(UserStuffEntity stuff, Long quality, ObjectEnum objectId) {
+        System.out.println("stuff" + stuff);
         switch (objectId) {
             case STUFF_HUMMER -> stuff.setHummerQty(stuff.getHummerQty() - quality);
             case STUFF_LIGHTNING -> stuff.setLightningQty(stuff.getLightningQty() - quality);
@@ -277,5 +271,15 @@ public class MapServiceImpl implements MapService {
             }
         }
         throw new RuntimeException("Not found stat for objectIdo");
+    }
+
+    private void checkUserExits(Long userId) {
+        getUserById(userId);
+    }
+
+    private UserEntity getUserById(Long userId) {
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found."));
     }
 }

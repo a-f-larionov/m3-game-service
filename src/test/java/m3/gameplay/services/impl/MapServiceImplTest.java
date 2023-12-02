@@ -241,10 +241,7 @@ class MapServiceImplTest {
         verify(stuffService).giveAShuffle(eq(userId), eq(400L));
         verify(stuffService).giveAGold(eq(userId), eq(100L));
 
-        verify(userStuffRepository).findById(eq(userId));
-        //verify(userStuffRepository).getByUserId(userId);
-        verify(stuffMapper).entityToDto(eq(expectedStuffEntity));
-        verify(kafkaTemplate).send(eq("topic-client"), eq(expectedStuffDto));
+        verify(stuffService).sendToUser(eq(userId));
 
         verify(commonSender).statistic(eq(userId), eq(StatisticEnum.ID_FINISH_PLAY), eq(pointId.toString()), eq(score.toString()));
         verify(commonSender).statistic(eq(userId), eq(StatisticEnum.ID_LEVEL_UP), eq(String.valueOf(pointId + 1)));
@@ -261,7 +258,7 @@ class MapServiceImplTest {
         Long userId = 100L;
         var expectedRs = buildGotStuffRsDto(userId);
         var userEntity = buildUserStuffEntity(userId);
-        when(userStuffRepository.findById(any())).thenReturn(Optional.of(userEntity));
+        when(stuffService.getUserStuff(any())).thenReturn(userEntity);
         when(stuffMapper.entityToDto(any())).thenReturn(expectedRs);
 
         // when
@@ -270,8 +267,8 @@ class MapServiceImplTest {
         // then
         assertThat(actualRs)
                 .isEqualTo(expectedRs);
-        verify(userStuffRepository).findById(userId);
-        verify(stuffMapper).entityToDto(userEntity);
+        verify(stuffService).getUserStuff(eq(userId));
+        verify(stuffMapper).entityToDto(eq(userEntity));
         verify(commonSender).statistic(eq(userId), eq(StatisticEnum.ID_BUY_TURNS));
     }
 
