@@ -7,7 +7,9 @@ public interface PaymentService {
 
     DoOrderChangeAnswerRsDto standaloneBuy(Long socNetUserId, Long itemPrice, Long orderId);
 
-    DoOrderChangeAnswerRsDto vkBuy(Long appId, Long socNetUserId, String sig, Long orderId, Long itemPrice, String notificationType, String status);
+    DoOrderChangeAnswerRsDto vkBuy(Long appId, Long socNetUserId, String sig,
+                                   Long itemPrice, Long orderId,
+                                   String notificationType, String status);
 
     DoOrderChangeAnswerRsDto doOrderChange(Long tid, SocNetType socNetType, Long socNetUserId, Long itemPrice, Long extOrderId);
 }

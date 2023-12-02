@@ -19,7 +19,8 @@ public class SharedController {
     public DoOrderChangeAnswerRsDto standaloneBuy(@RequestParam("receiver_id") Long socNetUserId,
                                                   @RequestParam("order_id") Long orderId,
                                                   @RequestParam("item_price") Long itemPrice) {
-        return paymentService.standaloneBuy(socNetUserId, orderId, itemPrice);
+        //@todo mvc tests
+        return paymentService.standaloneBuy(socNetUserId, itemPrice, orderId);
     }
 
     @GetMapping("/service/vk_buy")
@@ -33,6 +34,6 @@ public class SharedController {
             @RequestParam("notification_type") String notificationType,
             @RequestParam("status") String status
     ) {
-        return paymentService.vkBuy(appId, socNetUserId, sig, orderId, itemPrice, notificationType, status);
+        return paymentService.vkBuy(appId, socNetUserId, sig, itemPrice, orderId, notificationType, status);
     }
 }

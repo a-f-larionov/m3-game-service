@@ -113,8 +113,8 @@ public class PaymentServiceImpl implements PaymentService {
             return buildVKErrorCommon(tid);
         }
 
-        if (checkVKSign(sig, params)) {
-            commonSender.log(null, "Wrong signature. " + sig, ClientLogLevels.WARN, true);
+        if (!checkVKSign(sig, params)) {
+            commonSender.log(null, "Wrong signature. " + sig + " expected:" + calcVKSign(params), ClientLogLevels.WARN, true);
             return DoOrderChangeAnswerRsDto.builder()
                     .response(vkErrorSign)
                     .tid(tid)

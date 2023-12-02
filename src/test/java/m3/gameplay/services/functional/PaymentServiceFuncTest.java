@@ -61,15 +61,6 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
         assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), extOrderId);
     }
 
-    private static DoOrderChangeAnswerRsDto buildDoOrderChangeRsDto(Long tid, Long orderId) {
-        return DoOrderChangeAnswerRsDto.builder()
-                .tid(tid)
-                .response(VKResponseDoOrderSuccessRsDto.builder()
-                        .orderId(orderId)
-                        .build())
-                .build();
-    }
-
     @Test
     public void standaloneBuy() {
         // given
@@ -95,7 +86,7 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
 
         assertThat(actualRs.getTid()).isCloseTo(10L, Offset.offset(10L));
         assertThat(actualRs.getResponse()).isEqualTo(expectedRs.getResponse());
-        assertDbUserStuff(userId, product.getQuantity(), 10L, 20L, 30L);
+        assertDbUserStuff(userId, product.getQuantity(), 100L, 200L, 300L);
         assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), extOrderId);
     }
 
@@ -123,6 +114,7 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
         var actualRs = paymentService.vkBuy(appId, socNetUserId, sig, product.getPriceVotes(), extOrderId, notificationType, status);
 
         // then
+        assertThat(actualRs.getResponse()).isInstanceOf(VKResponseDoOrderSuccessRsDto.class);
         var paymentId = paymentRepository.findByOrderId(extOrderId).get().getId();
         ((VKResponseDoOrderSuccessRsDto) (expectedRs.getResponse())).setAppOrderId(paymentId);
 
@@ -168,5 +160,14 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
         jdbcTemplate.update("DELETE FROM users_stuff WHERE userId = ?", userId);
         jdbcTemplate.update("INSERT INTO users_stuff (userId, goldQty, hummerQty, lightningQty, shuffleQty) " +
                 "VALUE (?, ? ,? ,? ,?)", userId, gold, hummer, lightning, shuffle);
+    }
+
+    private static DoOrderChangeAnswerRsDto buildDoOrderChangeRsDto(Long tid, Long orderId) {
+        return DoOrderChangeAnswerRsDto.builder()
+                .tid(tid)
+                .response(VKResponseDoOrderSuccessRsDto.builder()
+                        .orderId(orderId)
+                        .build())
+                .build();
     }
 }
