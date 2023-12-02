@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "time", source = "time")
     @Mapping(target = "userId", source = "userId")
     @Mapping(target = "orderId", source = "orderId")
