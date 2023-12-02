@@ -94,7 +94,7 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
     public void vkBuy() {
         // given
         var appId = 123456789L;
-        var sig = "signature";
+        var sig = "58387ab03c8868925d738e8ca9d1d169";
         var reqId = 1L;
         var socNetType = SocNetType.VK;
         var socNetUserId = 120L;
