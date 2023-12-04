@@ -3,10 +3,7 @@ package m3.game.controllers;
 import lombok.RequiredArgsConstructor;
 import m3.game.dto.rs.DoOrderChangeAnswerRsDto;
 import m3.game.services.PaymentService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +33,7 @@ public class SharedController {
         return paymentService.vkBuy(appId, socNetUserId, sig, itemPrice, orderId, notificationType, status);
     }
 
-    @GetMapping("/service/vk_buy")
+    @PostMapping("/service/vk_buy")
     @ResponseBody
     public DoOrderChangeAnswerRsDto vkBuyPost(
             @RequestParam("app_id") Long appId,
