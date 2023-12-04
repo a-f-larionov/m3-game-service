@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import m3.game.dto.rs.DoOrderChangeAnswerRsDto;
 import m3.game.services.PaymentService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,14 +14,6 @@ public class SharedController {
 
     private final PaymentService paymentService;
 
-
-    @PostMapping("/service/standalone_buy")
-    @ResponseBody
-    public DoOrderChangeAnswerRsDto standaloneBuyPost(@RequestParam("receiver_id") Long socNetUserId,
-                                                  @RequestParam("order_id") Long orderId,
-                                                  @RequestParam("item_price") Long itemPrice) {
-        return paymentService.standaloneBuy(socNetUserId, itemPrice, orderId);
-    }
     @GetMapping("/service/standalone_buy")
     @ResponseBody
     public DoOrderChangeAnswerRsDto standaloneBuyGet(@RequestParam("receiver_id") Long socNetUserId,
@@ -33,7 +24,21 @@ public class SharedController {
 
     @GetMapping("/service/vk_buy")
     @ResponseBody
-    public DoOrderChangeAnswerRsDto vkBuy(
+    public DoOrderChangeAnswerRsDto vkBuyGet(
+            @RequestParam("app_id") Long appId,
+            @RequestParam("receiver_id") Long socNetUserId,
+            @RequestParam("sig") String sig,
+            @RequestParam("order_id") Long orderId,
+            @RequestParam("item_price") Long itemPrice,
+            @RequestParam("notification_type") String notificationType,
+            @RequestParam("status") String status
+    ) {
+        return paymentService.vkBuy(appId, socNetUserId, sig, itemPrice, orderId, notificationType, status);
+    }
+
+    @GetMapping("/service/vk_buy")
+    @ResponseBody
+    public DoOrderChangeAnswerRsDto vkBuyPost(
             @RequestParam("app_id") Long appId,
             @RequestParam("receiver_id") Long socNetUserId,
             @RequestParam("sig") String sig,
