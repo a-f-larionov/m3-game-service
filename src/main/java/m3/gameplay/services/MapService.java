@@ -32,4 +32,8 @@ public interface MapService {
     GotStuffRsDto buyProduct(Long userId, Long index, ObjectEnum objectId);
 
     GotStuffRsDto spendMagic(Long userId, ObjectEnum objectId);
+
+    void exitGame(Long userId, Long pointId);
+
+    void looseGame(Long userId, Long pointId);
 }

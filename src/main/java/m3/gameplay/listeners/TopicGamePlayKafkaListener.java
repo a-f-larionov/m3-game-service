@@ -110,4 +110,14 @@ public class TopicGamePlayKafkaListener {
                 rq.getOrderId()
         );
     }
+
+    @KafkaHandler
+    public void exitGame(ExitGameRqDto rq) {
+        mapService.exitGame(rq.getUserId(), rq.getPointId());
+    }
+
+    @KafkaHandler
+    public void looseGame(LooseGameRqDto rq) {
+        mapService.looseGame(rq.getUserId(), rq.getPointId());
+    }
 }

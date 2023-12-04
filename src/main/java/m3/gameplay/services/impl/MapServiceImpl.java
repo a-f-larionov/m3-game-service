@@ -230,6 +230,16 @@ public class MapServiceImpl implements MapService {
         return stuffMapper.entityToDto(userStuff);
     }
 
+    @Override
+    public void exitGame(Long userId, Long pointId) {
+        commonSender.statistic(userId, ID_EXIT_GAME, pointId.toString());
+    }
+
+    @Override
+    public void looseGame(Long userId, Long pointId) {
+        commonSender.statistic(userId, ID_LOOSE_GAME, pointId.toString());
+    }
+
     private static StatisticEnum getStatIdFromObjectId(ProductDto product) {
         return switch (product.getObjectEnum()) {
             case STUFF_HUMMER -> StatisticEnum.ID_BUY_HUMMER;
