@@ -108,8 +108,18 @@ public class PaymentServiceImpl implements PaymentService {
         //@todo return vkErrorCommon on validate error
         //@todo convert to DTO, and DTO on @GetMapping request!
 
-        if (!vkAppId.equals(appId)) {
+        if (!appId.equals(vkAppId)) {
             commonSender.log(null, "Wrong appId. " + appId, ClientLogLevels.WARN, true);
+            return buildVKErrorCommon(tid);
+        }
+
+        if (!(notificationType.equals("order_status_change") || notificationType.equals("order_status_change_test"))) {
+            commonSender.log(null, "Wrong notification type. " + status, ClientLogLevels.WARN, true);
+            return buildVKErrorCommon(tid);
+        }
+
+        if (!status.equals("chargeable")) {
+            commonSender.log(null, "Wrong status. " + status, ClientLogLevels.WARN, true);
             return buildVKErrorCommon(tid);
         }
 
@@ -121,17 +131,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .build();
         }
 
-        if (notificationType.equals("order_status_change") || notificationType.equals("order_status_change_test")) {
-            if (!status.equals("chargeable")) {
-                commonSender.log(null, "Wrong status. " + status, ClientLogLevels.WARN, true);
-                return buildVKErrorCommon(tid);
-            } else {
-                return doOrderChange(tid, SocNetType.VK, socNetUserId, itemPrice, orderId);
-            }
-        } else {
-            commonSender.log(null, "Wrong notification type. " + status, ClientLogLevels.WARN, true);
-            return buildVKErrorCommon(tid);
-        }
+        return doOrderChange(tid, SocNetType.VK, socNetUserId, itemPrice, orderId);
     }
 
     @Override
