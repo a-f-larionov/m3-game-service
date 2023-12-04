@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+//@todo use @ExtendWith(MockitoExtension.class) @InjectMocks
 class MapServiceImplTest {
     private final PointsService pointsService = mock(PointsService.class);
     private final ChestsService chestsService = mock(ChestsService.class);

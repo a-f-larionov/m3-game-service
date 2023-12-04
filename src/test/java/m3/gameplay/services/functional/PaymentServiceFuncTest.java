@@ -111,6 +111,7 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
         dbSetUserStuff(userId, 0L, 10L, 20L, 30L);
 
         // when
+
         var actualRs = paymentService.vkBuy(appId, socNetUserId, sig, product.getPriceVotes(), extOrderId, notificationType, status);
 
         // then
@@ -122,13 +123,6 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
         assertThat(actualRs.getResponse()).isEqualTo(expectedRs.getResponse());
         assertDbUserStuff(userId, product.getQuantity(), 10L, 20L, 30L);
         assertDbPaymentOrder(paymentId, userId, product.getPriceVotes(), extOrderId);
-    }
-
-    private Long dbCreateUser(SocNetType socNetType, Long socNetUserId) {
-        jdbcTemplate.update("INSERT INTO users (socNetTypeId, socNetUserId) VALUES " +
-                "(?, ?)", socNetType.getId(), socNetUserId);
-        Long userId = (Long) jdbcTemplate.queryForMap("SELECT id FROM users WHERE socNetTypeId = ? AND socNetUserId = ? ", socNetType.getId(), socNetUserId).get("ID");
-        return userId;
     }
 
     private void assertDbUserStuff(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
@@ -150,6 +144,13 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
 
     private void dbDeleteAllPayments() {
         jdbcTemplate.update("DELETE FROM payments WHERE id > 0");
+    }
+
+    private Long dbCreateUser(SocNetType socNetType, Long socNetUserId) {
+        jdbcTemplate.update("INSERT INTO users (socNetTypeId, socNetUserId) VALUES " +
+                "(?, ?)", socNetType.getId(), socNetUserId);
+        Long userId = (Long) jdbcTemplate.queryForMap("SELECT id FROM users WHERE socNetTypeId = ? AND socNetUserId = ? ", socNetType.getId(), socNetUserId).get("ID");
+        return userId;
     }
 
     private void dbDeleteAllUsers() {
