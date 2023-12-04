@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import m3.game.dto.rs.DoOrderChangeAnswerRsDto;
 import m3.game.services.PaymentService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,12 +15,19 @@ public class SharedController {
 
     private final PaymentService paymentService;
 
-    @GetMapping("/service/standalone_buy")
+
+    @PostMapping("/service/standalone_buy")
     @ResponseBody
-    public DoOrderChangeAnswerRsDto standaloneBuy(@RequestParam("receiver_id") Long socNetUserId,
+    public DoOrderChangeAnswerRsDto standaloneBuyPost(@RequestParam("receiver_id") Long socNetUserId,
                                                   @RequestParam("order_id") Long orderId,
                                                   @RequestParam("item_price") Long itemPrice) {
-        //@todo mvc tests
+        return paymentService.standaloneBuy(socNetUserId, itemPrice, orderId);
+    }
+    @GetMapping("/service/standalone_buy")
+    @ResponseBody
+    public DoOrderChangeAnswerRsDto standaloneBuyGet(@RequestParam("receiver_id") Long socNetUserId,
+                                                  @RequestParam("order_id") Long orderId,
+                                                  @RequestParam("item_price") Long itemPrice) {
         return paymentService.standaloneBuy(socNetUserId, itemPrice, orderId);
     }
 
