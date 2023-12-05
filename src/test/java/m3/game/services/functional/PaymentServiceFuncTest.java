@@ -94,7 +94,7 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
     public void vkBuy() {
         // given
         var appId = 123456789L;
-        var sig = "58387ab03c8868925d738e8ca9d1d169";
+        var sig = "29247ba16aee29ed41c082225f7c9965";
         var reqId = 1L;
         var socNetType = SocNetType.VK;
         var socNetUserId = 120L;
@@ -102,6 +102,7 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
         var extOrderId = 200L;
         var notificationType = "order_status_change_test";
         var status = "chargeable";
+        Map<String, String> body = Map.of("key", "value");
 
         var expectedRs = buildDoOrderChangeRsDto(reqId, extOrderId);
 
@@ -112,7 +113,7 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
 
         // when
 
-        var actualRs = paymentService.vkBuy(appId, socNetUserId, sig, product.getPriceVotes(), extOrderId, notificationType, status);
+        var actualRs = paymentService.vkBuy(appId, socNetUserId, sig, product.getPriceVotes(), extOrderId, notificationType, status, body);
 
         // then
         assertThat(actualRs.getResponse()).isInstanceOf(VKResponseDoOrderSuccessRsDto.class);
@@ -171,4 +172,5 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
                         .build())
                 .build();
     }
+
 }

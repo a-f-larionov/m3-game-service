@@ -43,7 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${socnet.vk.appId}")
     private Long vkAppId;
     @Value("${socnet.vk.secretKey}")
-    private String vkSecretKey;
+    private String vkSecretKey = "testSecretKey";
 
     private static final VKResponseDoOrderErrorRsDto vkErrorCommon = VKResponseDoOrderErrorRsDto
             .builder()
@@ -85,53 +85,39 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public DoOrderChangeAnswerRsDto vkBuy(Long appId, Long socNetUserId, String sig,
                                           Long itemPrice, Long orderId,
-                                          String notificationType, String status) {
-        Long tid = lastTid++;
-        //@todo how do it by one string from getParams\or may be Post?
-        Map<String, String> params = Map.of(
-                "app_id", appId.toString(),
-                "receiver_id", socNetUserId.toString(),
-                "sig", sig,
-                "order_id", orderId.toString(),
-                "item_price", itemPrice.toString(),
-                "notification_type", notificationType,
-                "status", status);
-
-        commonSender.log(null,
-                format("Standalone pay request incoming: \r\n" +
-                                "socNetUserId: %s orderId: %s itemPrice: %s",
-                        socNetUserId, orderId, itemPrice),
-                ClientLogLevels.INFO, true);
+                                          String notificationType, String status,
+                                          Map<String, String> params) {
+        Long prid = lastTid++;
+        commonSender.log(null, format("Prid: %s VkBuy pay request incoming params: %s ", prid, params.toString()), ClientLogLevels.INFO, true);
 
         //@todo write to file
         //@todo validate, every field is not null
         //@todo return vkErrorCommon on validate error
-        //@todo convert to DTO, and DTO on @GetMapping request!
 
         if (!appId.equals(vkAppId)) {
-            commonSender.log(null, "Wrong appId. " + appId, ClientLogLevels.WARN, true);
-            return buildVKErrorCommon(tid);
+            commonSender.log(null, format("Prid: %s. Wrong appId: %s ", prid, appId), ClientLogLevels.WARN, true);
+            return buildVKErrorCommon(prid);
         }
 
         if (!(notificationType.equals("order_status_change") || notificationType.equals("order_status_change_test"))) {
-            commonSender.log(null, "Wrong notification type. " + status, ClientLogLevels.WARN, true);
-            return buildVKErrorCommon(tid);
+            commonSender.log(null, format("Prid: %s. Wrong notification type `%s` ", prid, notificationType), ClientLogLevels.WARN, true);
+            return buildVKErrorCommon(prid);
         }
 
         if (!status.equals("chargeable")) {
-            commonSender.log(null, "Wrong status. " + status, ClientLogLevels.WARN, true);
-            return buildVKErrorCommon(tid);
+            commonSender.log(null, format("Prid: %s. Wrong status `%s` ", prid, status), ClientLogLevels.WARN, true);
+            return buildVKErrorCommon(prid);
         }
 
         if (!checkVKSign(sig, params)) {
-            commonSender.log(null, "Wrong signature. " + sig + " expected:" + calcVKSign(params), ClientLogLevels.WARN, true);
+            commonSender.log(null, format("Prid: %s. Wrong signature `%s` expected: `%s`", prid, sig, calcVKSign(params)), ClientLogLevels.WARN, true);
             return DoOrderChangeAnswerRsDto.builder()
                     .response(vkErrorSign)
-                    .tid(tid)
+                    .tid(prid)
                     .build();
         }
 
-        return doOrderChange(tid, SocNetType.VK, socNetUserId, itemPrice, orderId);
+        return doOrderChange(prid, SocNetType.VK, socNetUserId, itemPrice, orderId);
     }
 
     @Override
@@ -139,8 +125,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         var userOptional = userRepository.findBySocNetTypeIdAndSocNetUserId(socNetType.getId(), socNetUserId);
         if (userOptional.isEmpty()) {
-            commonSender.log(null, format("Order failed. Not user found.:\r\n" +
-                            "reqId: %s, userId: %s, orderId: %s, appOrderId: %s", reqId, "-", extOrderId, "-"),
+            commonSender.log(null, format("Prid: %s. Order failed. Not user found.:\r\n" +
+                            "userId: %s, orderId: %s, appOrderId: %s", reqId, "-", extOrderId, "-"),
                     ClientLogLevels.INFO, true);
             return DoOrderChangeAnswerRsDto.builder()
                     .tid(reqId)
@@ -150,8 +136,8 @@ public class PaymentServiceImpl implements PaymentService {
         var user = userOptional.get();
 
         if (!ShopStore.goldProductByPriceExists(itemPrice)) {
-            commonSender.log(null, format("Order failed. Not product found.:\r\n" +
-                            "reqId: %s, userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, "-"),
+            commonSender.log(null, format("Prid: %s .Order failed. Not product found.:\r\n" +
+                            " userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, "-"),
                     ClientLogLevels.INFO, true);
             return DoOrderChangeAnswerRsDto.builder()
                     .tid(reqId)
@@ -163,8 +149,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         Optional<PaymentEntity> payment = paymentRepository.findByOrderId(extOrderId);
         if (payment.isPresent()) {
-            commonSender.log(null, format("Order failed. Not user found.:\r\n" +
-                            "reqId: %s, userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, payment.get().getId()),
+            commonSender.log(null, format("Prid: %s .Order failed. Not user found.:\r\n" +
+                            " userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, payment.get().getId()),
                     ClientLogLevels.INFO, true);
             return DoOrderChangeAnswerRsDto.builder()
                     .tid(reqId)
@@ -182,8 +168,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), itemPrice.toString());
         //@todo write to file necessary
-        commonSender.log(user.getId(), format("Order successed:\r\n" +
-                        "reqId: %s, userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, newOrder.getId()),
+        commonSender.log(user.getId(), format("Prid: %s Order successed:\r\n" +
+                        " userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, newOrder.getId()),
                 ClientLogLevels.INFO, true);
 
         return DoOrderChangeAnswerRsDto.builder()
@@ -195,20 +181,20 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
 
-    private boolean checkVKSign(String sig, Map<String, String> params) {
+    @Override
+    public boolean checkVKSign(String sig, Map<String, String> params) {
         return sig.equals(calcVKSign(params));
     }
 
-    private String calcVKSign(Map<String, String> params) {
-        return DigestUtils.md5DigestAsHex(
-                (params.keySet()
-                        .stream()
-                        .filter(key -> !key.equals("sig"))
-                        .sorted()
-                        .map(k -> k + "=" + params.get(k))
-                        .collect(Collectors.joining(""))
-                        + vkSecretKey)
-                        .getBytes());
+    @Override
+    public String calcVKSign(Map<String, String> params) {
+        var paramsSorderKeyValueString = params.keySet()
+                .stream()
+                .filter(key -> !key.equals("sig"))
+                .sorted()
+                .map(k -> k + "=" + params.get(k))
+                .collect(Collectors.joining(""));
+        return DigestUtils.md5DigestAsHex((paramsSorderKeyValueString + vkSecretKey).getBytes());
     }
 
     private DoOrderChangeAnswerRsDto buildVKErrorCommon(Long tid) {
