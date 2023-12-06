@@ -15,11 +15,6 @@ spring:
       trusted_packages: "m3.game.dto.rq"
     topicName: 'topic-game'
 
-  profiles:
-    group:
-      home: local, suppress_useless_logs, home
-      local: local, suppress_useless_logs
-
   jpa:
     hibernate:
       naming:

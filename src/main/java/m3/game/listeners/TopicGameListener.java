@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @KafkaListener(topics = "topic-game")
-public class TopicGameKafkaListener {
+public class TopicGameListener {
 
     private final MapService mapService;
     private final PaymentService paymentService;

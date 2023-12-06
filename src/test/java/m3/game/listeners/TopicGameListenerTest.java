@@ -17,11 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class TopicGameKafkaListenerTest {
+class TopicGameListenerTest {
 
     private final MapService mapService = mock(MapService.class);
     private final PaymentService paymentService = mock(PaymentService.class);
-    private final TopicGameKafkaListener gameListener = new TopicGameKafkaListener(mapService, paymentService);
+    private final TopicGameListener gameListener = new TopicGameListener(mapService, paymentService);
 
     @Test
     void sendMeMapInfoRqDto() {
