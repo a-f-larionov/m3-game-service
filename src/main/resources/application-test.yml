@@ -10,6 +10,11 @@ spring:
     exclude:
       org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
 
+alerter:
+  telegram:
+    chatId: -1234567890123
+    token: 1234567890:THISISATESTATOKENABCDEFGHUJIKLMNOPQ
+
 socnet:
   vk:
     appId: 123456789
