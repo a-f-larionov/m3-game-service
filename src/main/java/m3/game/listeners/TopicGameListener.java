@@ -1,5 +1,6 @@
 package m3.game.listeners;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import m3.game.dto.rq.*;
@@ -24,84 +25,84 @@ public class TopicGameListener {
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotMapInfoRsDto sendMeMapInfoRqDto(SendMeMapInfoRqDto rq) {
+    public GotMapInfoRsDto sendMeMapInfoRqDto(@Valid SendMeMapInfoRqDto rq) {
         return mapService.getMapInfo(rq.getUserId(), rq.getMapId());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotScoresRsDto sendMeScoresRqDto(SendMeScoresRqDto rq) {
+    public GotScoresRsDto sendMeScoresRqDto(@Valid SendMeScoresRqDto rq) {
         return mapService.getScores(rq.getUserId(), rq.getPids(), rq.getUids());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotPointTopScoreRsDto sendMePointTopScore(SendMePointTopScoreRqDto rq) {
+    public GotPointTopScoreRsDto sendMePointTopScore(@Valid SendMePointTopScoreRqDto rq) {
         return mapService.getPointTopScore(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getFids());
     }
 
     @KafkaHandler
-    public void onFinish(OnFinishRqDto rq) {
+    public void onFinish(@Valid OnFinishRqDto rq) {
         mapService.onFinish(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getChestId());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto sendMeStuff(SendMeStuffRqDto rq) {
+    public GotStuffRsDto sendMeStuff(@Valid SendMeStuffRqDto rq) {
         return mapService.getUserStuffRsDto(rq.getUserId());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto spendCoinsForTurnsRqDto(SpendCoinsForTurnsRqDto rq) {
+    public GotStuffRsDto spendCoinsForTurnsRqDto(@Valid SpendCoinsForTurnsRqDto rq) {
         return mapService.spendCoinsForTurns(rq.getUserId());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public UpdateUserInfoRsDto buyHealth(BuyHealthRqDto rq) {
+    public UpdateUserInfoRsDto buyHealth(@Valid BuyHealthRqDto rq) {
         return mapService.buyHealth(rq.getUserId(), rq.getIndex());
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto buyHummer(BuyHummerRqDto rq) {
+    public GotStuffRsDto buyHummer(@Valid BuyHummerRqDto rq) {
         return mapService.buyProduct(rq.getUserId(), rq.getIndex(), ObjectEnum.STUFF_HUMMER);
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto buyLightning(BuyLightningRqDto rq) {
+    public GotStuffRsDto buyLightning(@Valid BuyLightningRqDto rq) {
         return mapService.buyProduct(rq.getUserId(), rq.getIndex(), ObjectEnum.STUFF_LIGHTNING);
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto buyShuffle(BuyShuffleRqDto rq) {
+    public GotStuffRsDto buyShuffle(@Valid BuyShuffleRqDto rq) {
         return mapService.buyProduct(rq.getUserId(), rq.getIndex(), ObjectEnum.STUFF_SHUFFLE);
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto usedHummer(UsedHummerRqDto rq) {
+    public GotStuffRsDto usedHummer(@Valid UsedHummerRqDto rq) {
         return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_HUMMER);
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto usedLightning(UsedLightningRqDto rq) {
+    public GotStuffRsDto usedLightning(@Valid UsedLightningRqDto rq) {
         return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_LIGHTNING);
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public GotStuffRsDto usedShuffle(UsedShuffleRqDto rq) {
+    public GotStuffRsDto usedShuffle(@Valid UsedShuffleRqDto rq) {
         return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_SHUFFLE);
     }
 
     @KafkaHandler
     @SendTo("topic-client")
-    public DoOrderChangeAnswerRsDto doOrderChange(DoOrderChangeRqDto rq) {
+    public DoOrderChangeAnswerRsDto doOrderChange(@Valid DoOrderChangeRqDto rq) {
         return paymentService.doOrderChange(
                 rq.getTid(),
                 rq.getSocNetType(),
@@ -112,12 +113,12 @@ public class TopicGameListener {
     }
 
     @KafkaHandler
-    public void exitGame(ExitGameRqDto rq) {
+    public void exitGame(@Valid ExitGameRqDto rq) {
         mapService.exitGame(rq.getUserId(), rq.getPointId());
     }
 
     @KafkaHandler
-    public void looseGame(LooseGameRqDto rq) {
+    public void looseGame(@Valid LooseGameRqDto rq) {
         mapService.looseGame(rq.getUserId(), rq.getPointId());
     }
 }

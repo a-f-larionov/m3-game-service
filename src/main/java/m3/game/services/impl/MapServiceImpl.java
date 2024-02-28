@@ -210,7 +210,7 @@ public class MapServiceImpl implements MapService {
         commonSender.statistic(userId, getStatIdFromObjectId(product));
         commonSender.log(userId,
                 "Игрок " + userId + " купил " + product.getObjectEnum().getComment() +
-                        ", теперь: " + userStuff.getQuantity(product.getObjectEnum()) +
+                        ", теперь: " + userStuff.getQuantityByObject(product.getObjectEnum()) +
                         ", 💰 " + userStuff.getGoldQty(),
                 ClientLogLevels.INFO, true);
 
@@ -252,9 +252,10 @@ public class MapServiceImpl implements MapService {
     private static void incrementStuff(UserStuffEntity stuff, ProductDto product) {
         switch (product.getObjectEnum()) {
             case STUFF_HUMMER -> stuff.setHummerQty(stuff.getHummerQty() + product.getQuantity());
-            case STUFF_LIGHTNING -> stuff.setLightningQty(stuff.getHummerQty() + product.getQuantity());
+            case STUFF_LIGHTNING -> stuff.setLightningQty(stuff.getLightningQty() + product.getQuantity());
             case STUFF_SHUFFLE -> stuff.setShuffleQty(stuff.getShuffleQty() + product.getQuantity());
             case STUFF_GOLD -> stuff.setGoldQty(stuff.getGoldQty() + product.getQuantity());
+            default -> throw new RuntimeException("Product not found.");
         }
     }
 

@@ -5,7 +5,6 @@ import m3.game.dto.rs.DoOrderChangeAnswerRsDto;
 import m3.game.dto.vk.rq.VKBuyRqBodyDto;
 import m3.game.mappers.VKBuyMapper;
 import m3.game.services.PaymentService;
-import m3.lib.kafka.sender.CommonSender;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +15,6 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final CommonSender commonSender;
     private final VKBuyMapper vkBuyMapper;
 
     @GetMapping("/service/standalone_buy")
@@ -29,8 +27,7 @@ public class PaymentController {
 
     @PostMapping(value = "/service/vk_buy",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-            produces = {
-                    MediaType.APPLICATION_JSON_VALUE
+            produces = {MediaType.APPLICATION_JSON_VALUE
             }
     )
     public DoOrderChangeAnswerRsDto vkBuyPost(@RequestParam Map<String, String> body) {
