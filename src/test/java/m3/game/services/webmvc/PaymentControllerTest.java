@@ -55,7 +55,7 @@ public class PaymentControllerTest {
 
         // when
         mvc.perform(MockMvcRequestBuilders
-                        .post("/service/vk_buy")
+                        .post("/service/web/vk_buy")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                         .content(createRequestContent(appId, socNetUserId, sig, extOrderId, product, notificationType, status)))

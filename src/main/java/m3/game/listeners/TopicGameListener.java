@@ -7,6 +7,7 @@ import m3.game.dto.rq.*;
 import m3.game.dto.rs.*;
 import m3.game.services.MapService;
 import m3.game.services.PaymentService;
+import m3.lib.ProfileThis;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 import org.springframework.kafka.annotation.KafkaHandler;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @KafkaListener(topics = "topic-game")
+@ProfileThis
 public class TopicGameListener {
 
     private final MapService mapService;
