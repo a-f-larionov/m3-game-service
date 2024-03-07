@@ -6,12 +6,14 @@ import m3.game.services.PointsService;
 import m3.game.store.PointStore;
 import m3.lib.settings.MapSettings;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PointsServiceImpl implements PointsService {
 
     @Override

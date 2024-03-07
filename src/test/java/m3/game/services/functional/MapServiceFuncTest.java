@@ -1,6 +1,7 @@
 package m3.game.services.functional;
 
 import m3.game.BaseSpringBootTest;
+import m3.game.dto.rq.OnFinishRqDto;
 import m3.game.dto.rs.GotScoresRsDto;
 import m3.game.dto.rs.GotStuffRsDto;
 import m3.game.dto.rs.ScoreRsDto;
@@ -251,6 +252,21 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
     @Test
     @Disabled
     void onFinishWithPrizes() {
+        // given
+        var rq = OnFinishRqDto.builder()
+                .userId(1000L)
+                .pointId(1L)
+                .chestId(2L)
+                .score(100L)
+                .build();
+        deleteAllUsers();
+        jdbcTemplate.update("INSERT INTO users (id, socNetUserId, socNetTypeId, create_tm, login_tm, logout_tm, nextPointId, fullRecoveryTime) " +
+                "VALUES (?, 1, 2, 3, 4, 5, 6, 7)", rq.getUserId());
+
+        setUserStuff(rq.getUserId(), 1000L, 10L, 20L, 30L);
+
+        // when
+        mapService.onFinish(rq.getUserId(), rq.getPointId(), rq.getScore(), rq.getChestId());
     }
 
     private void deleteAllUsersPoints() {

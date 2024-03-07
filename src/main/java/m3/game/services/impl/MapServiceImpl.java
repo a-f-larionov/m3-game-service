@@ -40,8 +40,8 @@ import java.util.Optional;
 import static m3.lib.enums.StatisticEnum.*;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 public class MapServiceImpl implements MapService {
 
     private final PointsService pointsService;
