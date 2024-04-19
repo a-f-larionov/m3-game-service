@@ -16,5 +16,10 @@ public interface MapMapper {
     @Mapping(target = "userId", source = "id")
     UpdateUserInfoRsDto entityToDto(UserEntity user);
 
-    GotMapInfoRsDto entitiesToRsDto(Long userId, Long mapId, MapDto map, List<PointDto> points);
+    GotMapInfoRsDto entitiesToRsDto(
+            Long userId,
+            Long mapId,
+            MapDto map,
+            List<PointDto> points
+    );
 }
