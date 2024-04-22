@@ -181,72 +181,14 @@ public class MapServiceFuncTest extends BaseSpringBootTest {
         assertThat(fullRecoveryTime).isCloseTo(currenttime, Offset.offset(10L));
     }
 
-    private void assertDbPaymentOrder(Long id, Long userId, Long itemPrice, Long orderId) {
-        Map<String, Object> data = jdbcTemplate.queryForMap("SELECT * FROM payments WHERE id = ? ", id);
-        assertThat((Long) data.get("TIME")).isCloseTo(System.currentTimeMillis() / 1000, Offset.offset(10L));
-        assertThat((Long) data.get("USERID")).isEqualTo(userId);
-        assertThat((Long) data.get("ITEMPRICE")).isEqualTo(itemPrice);
-        assertThat((Long) data.get("ORDERID")).isEqualTo(orderId);
-    }
-
-    private void deleteAllPayments() {
-        jdbcTemplate.update("DELETE FROM payments WHERE id > 0");
-    }
-
     private void deleteAllUsers() {
-        jdbcTemplate.update("DELETE FROM users WHERE create_tm IS NOT NULL OR create_tm IS NULL");
+        jdbcTemplate.update("delete from users where create_tm is not null or create_tm is null");
     }
 
     private void setUserStuff(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
         jdbcTemplate.update("DELETE FROM users_stuff WHERE userId = ?", userId);
         jdbcTemplate.update("INSERT INTO users_stuff (userId, goldQty, hummerQty, lightningQty, shuffleQty) " +
-                "VALUE (?, ? ,? ,? ,?)", userId, gold, hummer, lightning, shuffle);
-    }
-
-    @Test
-    @Disabled
-    void existsMap() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @Disabled
-    void getById() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @Disabled
-    void getMapInfo() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @Disabled
-    void gotPointTopScore() {
-    }
-
-    @Test
-    @Disabled
-    void onFinishWithNoUserExists() {
-
-    }
-
-    @Test
-    @Disabled
-    void onFinishWithNoChest() {
+                "VALUES (?, ? ,? ,? ,?)", userId, gold, hummer, lightning, shuffle);
     }
 
     @Test

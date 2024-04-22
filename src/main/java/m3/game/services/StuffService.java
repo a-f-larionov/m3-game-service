@@ -19,7 +19,7 @@ public interface StuffService {
 
     void spendAGold(Long userId, Long quantity);
 
-    void sendToUser(Long userId);
+    void sendStuffToUser(Long userId);
 
     UserStuffEntity getUserStuff(Long userId);
 }

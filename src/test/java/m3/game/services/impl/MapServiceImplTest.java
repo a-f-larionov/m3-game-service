@@ -242,7 +242,7 @@ class MapServiceImplTest {
         verify(stuffService).giveAShuffle(eq(userId), eq(400L));
         verify(stuffService).giveAGold(eq(userId), eq(100L));
 
-        verify(stuffService).sendToUser(eq(userId));
+        verify(stuffService).sendStuffToUser(eq(userId));
 
         verify(commonSender).statistic(eq(userId), eq(StatisticEnum.ID_FINISH_PLAY), eq(pointId.toString()), eq(score.toString()));
         verify(commonSender).statistic(eq(userId), eq(StatisticEnum.ID_LEVEL_UP), eq(String.valueOf(pointId + 1)));
@@ -271,56 +271,6 @@ class MapServiceImplTest {
         verify(stuffService).getUserStuff(eq(userId));
         verify(stuffMapper).entityToDto(eq(userEntity));
         verify(commonSender).statistic(eq(userId), eq(StatisticEnum.ID_BUY_TURNS));
-    }
-
-    @Test
-    @Disabled
-    void onFinish() {
-    }
-
-    @Test
-    @Disabled
-    void getPointTopScore() {
-    }
-
-    @Test
-    @Disabled
-    void getUserStuff() {
-    }
-
-    @Test
-    @Disabled
-    void giveChest() {
-    }
-
-    @Test
-    @Disabled
-    void existsMap() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @Disabled
-    void getById() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @Disabled
-    void getMapInfo() {
-        // given
-
-        // when
-
-        // then
     }
 
     private static GotStuffRsDto buildGotStuffRsDto(Long userId) {

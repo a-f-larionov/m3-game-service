@@ -164,7 +164,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         stuffService.giveAGold(user.getId(), product.getQuantity());
 
-        stuffService.sendToUser(user.getId());
+        stuffService.sendStuffToUser(user.getId());
 
         commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), itemPrice.toString());
         //@todo write to file necessary

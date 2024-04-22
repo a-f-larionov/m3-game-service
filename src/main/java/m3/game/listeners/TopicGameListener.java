@@ -7,7 +7,7 @@ import m3.game.dto.rq.*;
 import m3.game.dto.rs.*;
 import m3.game.services.MapService;
 import m3.game.services.PaymentService;
-import m3.lib.ProfileThis;
+import m3.lib.ProfileMethods;
 import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 import org.springframework.kafka.annotation.KafkaHandler;
@@ -15,16 +15,19 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
+
+//@todo topics = "topic-game", "topic-client" -> application.yaml varialbe
 @RequiredArgsConstructor
 @Component
 @Slf4j
 @KafkaListener(topics = "topic-game")
-@ProfileThis
+@ProfileMethods
 public class TopicGameListener {
 
     private final MapService mapService;
     private final PaymentService paymentService;
 
+    //@todo aop proxy getUserId and return auto userId set?
     @KafkaHandler
     @SendTo("topic-client")
     public GotMapInfoRsDto sendMeMapInfoRqDto(@Valid SendMeMapInfoRqDto rq) {
@@ -66,6 +69,8 @@ public class TopicGameListener {
         return mapService.buyHealth(rq.getUserId(), rq.getIndex());
     }
 
+    //@todo Buy [ Hummer, Lightning, Shuffle ] RqDto.
+    //@todo Used [ Hummer, Lightning, Shuffle ] RqDto.
     @KafkaHandler
     @SendTo("topic-client")
     public GotStuffRsDto buyHummer(@Valid BuyHummerRqDto rq) {
@@ -102,6 +107,7 @@ public class TopicGameListener {
         return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_SHUFFLE);
     }
 
+    //@todo is code used?
     @KafkaHandler
     @SendTo("topic-client")
     public DoOrderChangeAnswerRsDto doOrderChange(@Valid DoOrderChangeRqDto rq) {

@@ -16,5 +16,5 @@ public interface VKBuyMapper {
     @Mapping(target = "itemPrice", source = "item_price")
     @Mapping(target = "notificationType", source = "notification_type")
     @Mapping(target = "status", source = "status")
-    VKBuyRqBodyDto toDto(Map<String, String> map);
+    VKBuyRqBodyDto bodyToDto(Map<String, String> map);
 }

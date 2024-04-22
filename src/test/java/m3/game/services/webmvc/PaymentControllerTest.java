@@ -51,7 +51,7 @@ public class PaymentControllerTest {
         var status = "chargeable";
         Map<String, String> body = createMapBody(appId, socNetUserId, sig, extOrderId, product, notificationType, status);
 
-        when(vkBuyMapper.toDto(any())).thenReturn(builldVkRqBodyDto(product, socNetUserId, appId, notificationType, extOrderId, sig, status));
+        when(vkBuyMapper.bodyToDto(any())).thenReturn(builldVkRqBodyDto(product, socNetUserId, appId, notificationType, extOrderId, sig, status));
 
         // when
         mvc.perform(MockMvcRequestBuilders

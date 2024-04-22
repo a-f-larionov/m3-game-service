@@ -4,6 +4,7 @@ import m3.game.BaseSpringBootTest;
 import m3.game.dto.rs.DoOrderChangeAnswerRsDto;
 import m3.game.dto.vk.rs.VKResponseDoOrderSuccessRsDto;
 import m3.game.services.PaymentService;
+import m3.lib.entities.UserStuffEntity;
 import m3.lib.enums.SocNetType;
 import m3.lib.repositories.PaymentRepository;
 import m3.lib.store.ShopStore;
@@ -155,13 +156,13 @@ public class PaymentServiceFuncTest extends BaseSpringBootTest {
     }
 
     private void dbDeleteAllUsers() {
-        jdbcTemplate.update("DELETE FROM users WHERE create_tm IS NOT NULL OR create_tm IS NULL");
+        jdbcTemplate.update("delete from users where create_tm is not null or create_tm is null");
     }
 
     private void dbSetUserStuff(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
-        jdbcTemplate.update("DELETE FROM users_stuff WHERE userId = ?", userId);
-        jdbcTemplate.update("INSERT INTO users_stuff (userId, goldQty, hummerQty, lightningQty, shuffleQty) " +
-                "VALUE (?, ? ,? ,? ,?)", userId, gold, hummer, lightning, shuffle);
+        jdbcTemplate.update("delete from users_stuff where userId = ?", userId);
+        jdbcTemplate.update("insert into users_stuff (userId, goldQty, hummerQty, lightningQty, shuffleQty) " +
+                "VALUES (?, ? ,? ,? ,?)", userId, gold, hummer, lightning, shuffle);
     }
 
     private static DoOrderChangeAnswerRsDto buildDoOrderChangeRsDto(Long tid, Long orderId) {

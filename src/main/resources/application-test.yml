@@ -2,7 +2,7 @@ filename: app-test
 spring:
 
   datasource:
-    url: jdbc:mysql://localhost:13306/test
+    url: jdbc:postgresql://localhost:5432/test
     username: test
     password: test
 
@@ -10,6 +10,7 @@ spring:
     exclude:
       org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
 
+# @todo alerter disable for tests exlucde autoconfigure!
 alerter:
   telegram:
     chatId: -1234567890123

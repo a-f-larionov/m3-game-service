@@ -50,6 +50,7 @@ public class MapServiceImpl implements MapService {
     private final MapMapper mapMapper;
     private final StuffMapper stuffMapper;
     private final ScoreMapper scoreMapper;
+    //@todo code analyze
     private final PaymentMapper paymentMapper;
     private final UserRepository userRepository;
     private final UserPointRepository userPointRepository;
@@ -60,12 +61,14 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public boolean existsMap(Long mapId) {
+        //@todo ?
         return MapStore.maps.stream()
                 .anyMatch(m -> m.getId().equals(mapId));
     }
 
     @Override
     public MapDto getById(Long mapId) {
+        //@todo getById
         return MapStore.maps.stream()
                 .filter(m -> m.getId().equals(mapId))
                 .findFirst()
@@ -94,7 +97,7 @@ public class MapServiceImpl implements MapService {
     @Override
     public void onFinish(Long userId, Long pointId, Long score, Long chestId) {
         // @todo transactional one for all methods
-        checkUserExits(userId);
+        isUserExistsOrThrowException(userId);
 
         updateUserPoint(userId, pointId, score);
         nextPointUp(userId, pointId);
@@ -127,6 +130,7 @@ public class MapServiceImpl implements MapService {
         if (userStuff.isEmpty()) {
             userStuffRepository.creatUserStuff(userId);
             userStuff = userStuffRepository.findById(userId);
+            //@todo just get?
         }
         return stuffMapper.entityToDto(userStuff.get());
     }
@@ -156,7 +160,7 @@ public class MapServiceImpl implements MapService {
             }
         });
 
-        stuffService.sendToUser(userId);
+        stuffService.sendStuffToUser(userId);
 
         //@Todo transaction control!
         commonSender.statistic(userId, StatisticEnum.ID_OPEN_CHEST, chestId.toString());
@@ -167,6 +171,7 @@ public class MapServiceImpl implements MapService {
         var product = ShopStore.turnsUp;
         var userStuff = stuffService.getUserStuff(userId);
         System.out.println(userStuff);
+        //@todo find any System.out.println();
         decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.STUFF_GOLD);
 
         userStuffRepository.save(userStuff);
@@ -181,7 +186,7 @@ public class MapServiceImpl implements MapService {
         var userStuff = stuffService.getUserStuff(userId);
 
         if (UserHelper.getHealths(userEntity) > 0) {
-            commonSender.log(userId, "The user has more than zero lives.o", ClientLogLevels.WARN, true);
+            commonSender.log(userId, "The user has more than zero lives.", ClientLogLevels.WARN, true);
         }
         decrementStuff(userStuff, ShopStore.health.getPriceGold(), ObjectEnum.STUFF_GOLD);
         UserHelper.setMaxHealth(userEntity);
@@ -192,7 +197,7 @@ public class MapServiceImpl implements MapService {
         commonSender.log(userId, "Игрок " + userId + " купил жизней❤❤❤❤❤ " + userStuff, ClientLogLevels.INFO, true);
         commonSender.statistic(userId, ID_BUY_HEALTH);
 
-        stuffService.sendToUser(userId);
+        stuffService.sendStuffToUser(userId);
 
         return mapMapper.entityToDto(userEntity);
     }
@@ -241,6 +246,7 @@ public class MapServiceImpl implements MapService {
     }
 
     private static StatisticEnum getStatIdFromObjectId(ProductDto product) {
+        //@todo may be one statisitc BUY_ITEM with param id product?
         return switch (product.getObjectEnum()) {
             case STUFF_HUMMER -> StatisticEnum.ID_BUY_HUMMER;
             case STUFF_LIGHTNING -> StatisticEnum.ID_BUY_LIGHTNING;
@@ -261,6 +267,7 @@ public class MapServiceImpl implements MapService {
 
     private static void decrementStuff(UserStuffEntity stuff, Long quality, ObjectEnum objectId) {
         System.out.println("stuff" + stuff);
+        // universalization may be?
         switch (objectId) {
             case STUFF_HUMMER -> stuff.setHummerQty(stuff.getHummerQty() - quality);
             case STUFF_LIGHTNING -> stuff.setLightningQty(stuff.getLightningQty() - quality);
@@ -270,21 +277,16 @@ public class MapServiceImpl implements MapService {
     }
 
     private static StatisticEnum getUsedStatFromObject(ObjectEnum objectId) {
-        switch (objectId) {
-            case STUFF_HUMMER -> {
-                return ID_HUMMER_USE;
-            }
-            case STUFF_LIGHTNING -> {
-                return ID_LIGHTNING_USE;
-            }
-            case STUFF_SHUFFLE -> {
-                return ID_SHUFFLE_USE;
-            }
-        }
-        throw new RuntimeException("Not found stat for objectIdo");
+        return switch (objectId) {
+            case STUFF_HUMMER -> ID_HUMMER_USE;
+            case STUFF_LIGHTNING -> ID_LIGHTNING_USE;
+            case STUFF_SHUFFLE -> ID_SHUFFLE_USE;
+            default -> throw new RuntimeException("Not found stat for objectId");
+        };
     }
 
-    private void checkUserExits(Long userId) {
+    private void isUserExistsOrThrowException(Long userId) {
+        //@todo method just call method
         getUserById(userId);
     }
 
