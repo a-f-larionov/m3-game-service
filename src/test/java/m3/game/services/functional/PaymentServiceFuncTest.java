@@ -4,7 +4,6 @@ import m3.game.BaseSpringBootTest;
 import m3.game.dto.rs.DoOrderChangeAnswerRsDto;
 import m3.game.dto.vk.rs.VKResponseDoOrderSuccessRsDto;
 import m3.game.services.PaymentService;
-import m3.lib.entities.UserStuffEntity;
 import m3.lib.enums.SocNetType;
 import m3.lib.repositories.PaymentRepository;
 import m3.lib.store.ShopStore;
