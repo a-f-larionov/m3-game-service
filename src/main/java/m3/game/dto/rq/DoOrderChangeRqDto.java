@@ -12,9 +12,9 @@ import m3.lib.enums.SocNetType;
 @Getter
 @Setter
 @EqualsAndHashCode
-@ToString(callSuper = true)
+@ToString
 public class DoOrderChangeRqDto {
-    @NonNull
+    @NotNull
     private Long tid;
     @JsonProperty("receiver_id")
     @NotNull

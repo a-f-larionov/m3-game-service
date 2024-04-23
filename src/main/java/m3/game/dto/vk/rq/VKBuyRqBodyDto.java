@@ -11,7 +11,6 @@ import lombok.ToString;
 @ToString
 @Builder
 public class VKBuyRqBodyDto {
-
     @JsonProperty("app_id")
     private Long appId;
     @JsonProperty("receiver_id")

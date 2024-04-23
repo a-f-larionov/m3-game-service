@@ -51,7 +51,7 @@ public class PaymentControllerTest {
         var status = "chargeable";
         Map<String, String> body = createMapBody(appId, socNetUserId, sig, extOrderId, product, notificationType, status);
 
-        when(vkBuyMapper.bodyToDto(any())).thenReturn(builldVkRqBodyDto(product, socNetUserId, appId, notificationType, extOrderId, sig, status));
+        when(vkBuyMapper.bodyToDto(any())).thenReturn(buildVkRqBodyDto(product, socNetUserId, appId, notificationType, extOrderId, sig, status));
 
         // when
         mvc.perform(MockMvcRequestBuilders
@@ -95,7 +95,7 @@ public class PaymentControllerTest {
                 "&status=" + status;
     }
 
-    private static VKBuyRqBodyDto builldVkRqBodyDto(ProductDto product, long socNetUserId, long appId, String notificationType, long extOrderId, String sig, String status) {
+    private static VKBuyRqBodyDto buildVkRqBodyDto(ProductDto product, long socNetUserId, long appId, String notificationType, long extOrderId, String sig, String status) {
         return VKBuyRqBodyDto.builder()
                 .appId(appId)
                 .date(123123L)

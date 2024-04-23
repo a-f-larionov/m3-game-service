@@ -1,5 +1,6 @@
 package m3.game.controllers;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import m3.game.dto.rs.DoOrderChangeAnswerRsDto;
 import m3.game.dto.vk.rq.VKBuyRqBodyDto;
@@ -42,9 +43,9 @@ public class PaymentController {
 
     @GetMapping("/service/web/standalone_buy")
     public DoOrderChangeAnswerRsDto standaloneBuyGet(
-            @RequestParam("receiver_id") Long socNetUserId,
-            @RequestParam("order_id") Long orderId,
-            @RequestParam("item_price") Long itemPrice) {
+            @RequestParam("receiver_id") @NotNull Long socNetUserId,
+            @RequestParam("order_id") @NotNull Long orderId,
+            @RequestParam("item_price") @NotNull Long itemPrice) {
         return paymentService.standaloneBuy(socNetUserId, itemPrice, orderId);
     }
 

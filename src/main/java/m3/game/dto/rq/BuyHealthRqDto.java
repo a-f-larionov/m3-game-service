@@ -6,7 +6,6 @@ import lombok.experimental.SuperBuilder;
 import m3.lib.dto.rq.UserIdRqDto;
 import org.hibernate.validator.constraints.Range;
 
-// @todo check every rqdto has validation?
 @SuperBuilder
 @NoArgsConstructor
 @Getter
