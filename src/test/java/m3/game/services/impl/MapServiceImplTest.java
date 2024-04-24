@@ -229,12 +229,6 @@ class MapServiceImplTest {
                                 PrizeDto.builder().id(STUFF_SHUFFLE).count(400L).build()
                         ))
                         .build());
-//        when(stuffMapper.entityToDto(any()))
-//                .thenReturn(expectedStuffDto);
-
-//        when(userStuffRepository.findById(any()))
-//                .thenReturn(Optional.of(expectedStuffEntity));
-
         // when
         mapService.onFinish(userId, pointId, score, chestId);
 
