@@ -31,9 +31,9 @@
       "description": "Description for spring.kafka.consumer.trusted_packages."
     },
     {
-      "name": "spring.kafka.topicName",
+      "name": "spring.kafka.topics",
       "type": "java.lang.String",
-      "description": "Description for spring.kafka.topicName."
+      "description": "Array of kafka topics"
     },
     {
       "name": "socnet.vk.secretKey",

@@ -5,6 +5,7 @@ import m3.game.dto.rs.GotStuffRsDto;
 import m3.game.mappers.StuffMapper;
 import m3.game.services.StuffService;
 import m3.lib.entities.UserStuffEntity;
+import m3.lib.kafka.TopicNames;
 import m3.lib.repositories.UserStuffRepository;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -64,11 +65,12 @@ public class StuffServiceImpl implements StuffService {
         var stuff = getUserStuff(userId);
         GotStuffRsDto stuffRsDto = stuffMapper.entityToDto(stuff);
         //@todo got it as a value from application.yaml
-        kafkaTemplate.send("topic-client", stuffRsDto);
+        kafkaTemplate.send(TopicNames.CLIENT, stuffRsDto);
     }
 
     @Override
     public UserStuffEntity getUserStuff(Long userId) {
+        //@todo remove very println and so on...
         System.out.println(userId);
         System.out.println(userStuffRepository.findById(userId));
         //@TODO? GetOrThrow?
