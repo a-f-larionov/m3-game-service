@@ -27,6 +27,10 @@ import m3.lib.repositories.UserStuffRepository;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.List;
@@ -38,28 +42,28 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 //@todo use @ExtendWith(MockitoExtension.class) @InjectMocks
+@ExtendWith(MockitoExtension.class)
 class MapServiceImplTest {
-    private final PointsService pointsService = mock(PointsService.class);
-    private final ChestsService chestsService = mock(ChestsService.class);
-    private final StuffService stuffService = mock(StuffService.class);
-    private final MapMapper mapMapper = mock(MapMapper.class);
-    private final StuffMapper stuffMapper = mock(StuffMapper.class);
-    private final ScoreMapper scoreMapper = mock(ScoreMapper.class);
-    private final PaymentMapper paymentMapper = mock(PaymentMapper.class);
-    private final UserRepository userRepository = mock(UserRepository.class);
-    private final UserPointRepository userPointRepository = mock(UserPointRepository.class);
-    private final UserStuffRepository userStuffRepository = mock(UserStuffRepository.class);
-    private final PaymentRepository paymentRepository = mock(PaymentRepository.class);
-    private final CommonSender commonSender = mock(CommonSender.class);
-    private final KafkaTemplate<String, Object> kafkaTemplate = mock(KafkaTemplate.class);
-
-    private final MapService mapService = new MapServiceImpl(
-
-            pointsService, chestsService, stuffService,
-            mapMapper, stuffMapper, scoreMapper, paymentMapper,
-            userRepository, userPointRepository, userStuffRepository, paymentRepository,
-            commonSender,
-            kafkaTemplate);
+    @Mock
+    private ChestsService chestsService;
+    @Mock
+    private StuffService stuffService;
+    @Mock
+    private StuffMapper stuffMapper;
+    @Mock
+    private ScoreMapper scoreMapper;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private UserPointRepository userPointRepository;
+    @Mock
+    private UserStuffRepository userStuffRepository;
+    @Mock
+    private CommonSender commonSender;
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+    @InjectMocks
+    private MapServiceImpl mapService;
 
     @Test
     void getScores() {
@@ -225,11 +229,11 @@ class MapServiceImplTest {
                                 PrizeDto.builder().id(STUFF_SHUFFLE).count(400L).build()
                         ))
                         .build());
-        when(stuffMapper.entityToDto(any()))
-                .thenReturn(expectedStuffDto);
+//        when(stuffMapper.entityToDto(any()))
+//                .thenReturn(expectedStuffDto);
 
-        when(userStuffRepository.findById(any()))
-                .thenReturn(Optional.of(expectedStuffEntity));
+//        when(userStuffRepository.findById(any()))
+//                .thenReturn(Optional.of(expectedStuffEntity));
 
         // when
         mapService.onFinish(userId, pointId, score, chestId);

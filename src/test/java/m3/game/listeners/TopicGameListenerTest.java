@@ -10,6 +10,10 @@ import m3.lib.dto.rs.UpdateUserInfoRsDto;
 import m3.lib.enums.ObjectEnum;
 import m3.lib.enums.SocNetType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
@@ -17,11 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class TopicGameListenerTest {
-
-    private final MapService mapService = mock(MapService.class);
-    private final PaymentService paymentService = mock(PaymentService.class);
-    private final TopicGameListener gameListener = new TopicGameListener(mapService, paymentService);
+    @Mock
+    private MapService mapService;
+    @Mock
+    private PaymentService paymentService;
+    @InjectMocks
+    private TopicGameListener gameListener;
 
     @Test
     void sendMeMapInfoRqDto() {
