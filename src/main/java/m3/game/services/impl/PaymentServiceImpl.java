@@ -32,7 +32,7 @@ import static m3.lib.enums.StatisticEnum.ID_BUY_VK_MONEY;
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
 
-    //@todo thread safe counter!
+    //@todo-a thread safe counter!
     private static Long lastTid = 1L;
 
     private final UserRepository userRepository;
@@ -90,9 +90,9 @@ public class PaymentServiceImpl implements PaymentService {
         Long prid = lastTid++;
         commonSender.log(null, format("Prid: %s VkBuy pay request incoming params: %s ", prid, params.toString()), ClientLogLevels.INFO, true);
 
-        //@todo write to file
-        //@todo validate, every field is not null
-        //@todo return vkErrorCommon on validate error
+        //@todo-a write to file
+        //@todo-a validate, every field is not null
+        //@todo-a return vkErrorCommon on validate error
 
         if (!appId.equals(vkAppId)) {
             commonSender.log(null, format("Prid: %s. Wrong appId: %s ", prid, appId), ClientLogLevels.WARN, true);
@@ -158,7 +158,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .build();
         }
 
-        //@todo transaction analyzing. payment saved, but user stuff throw exception!
+        //@todo-a transaction analyzing. payment saved, but user stuff throw exception!
         PaymentEntity entity = paymentMapper.toEntity(System.currentTimeMillis() / 1000L, user.getId(), extOrderId, itemPrice);
         PaymentEntity newOrder = paymentRepository.save(entity);
 
@@ -167,7 +167,7 @@ public class PaymentServiceImpl implements PaymentService {
         stuffService.sendStuffToUser(user.getId());
 
         commonSender.statistic(user.getId(), ID_BUY_VK_MONEY, newOrder.getId().toString(), itemPrice.toString());
-        //@todo write to file necessary
+        //@todo-a write to file necessary
         commonSender.log(user.getId(), format("Prid: %s Order successed:\r\n" +
                         " userId: %s, orderId: %s, appOrderId: %s", reqId, user.getId(), extOrderId, newOrder.getId()),
                 ClientLogLevels.INFO, true);

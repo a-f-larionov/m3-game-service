@@ -10,7 +10,7 @@ spring:
     exclude:
       org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
 
-# @todo alerter disable for tests exlucde autoconfigure!
+# @todo-a alerter disable for tests exlucde autoconfigure!
 alerter:
   telegram:
     chatId: -1234567890123

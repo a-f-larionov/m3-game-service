@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChestsServiceImpl implements ChestsService {
     @Override
     public ChestDto getById(Long chestId) {
-        //@todo getById! what is a pattern?
+        //@todo-a getById! what is a pattern?
         return ChestsStore.chests.stream()
                 .filter(chest -> chest.getId().equals(chestId))
                 .findFirst()

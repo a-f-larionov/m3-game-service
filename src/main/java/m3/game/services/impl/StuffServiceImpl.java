@@ -64,16 +64,16 @@ public class StuffServiceImpl implements StuffService {
     public void sendStuffToUser(Long userId) {
         var stuff = getUserStuff(userId);
         GotStuffRsDto stuffRsDto = stuffMapper.entityToDto(stuff);
-        //@todo got it as a value from application.yaml
+        //@todo-a got it as a value from application.yaml
         kafkaTemplate.send(TopicNames.CLIENT, stuffRsDto);
     }
 
     @Override
     public UserStuffEntity getUserStuff(Long userId) {
-        //@todo remove very println and so on...
+        //@todo-a remove very println and so on...
         System.out.println(userId);
         System.out.println(userStuffRepository.findById(userId));
-        //@TODO? GetOrThrow?
+        //@todo-a? GetOrThrow?
         return userStuffRepository
                 .findById(userId)
                 .orElseThrow(() -> new RuntimeException("User stuff not found"));

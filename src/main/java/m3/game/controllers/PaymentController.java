@@ -25,14 +25,14 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final VKBuyMapper vkBuyMapper;
 
-    // @todo devide controllers
-    // @todo /service -> /payment
+    // @todo-a devide controllers
+    // @todo-a /service -> /payment
 
     @GetMapping("/service/web/profiler")
     public String methodProfiles() {
         StringBuilder out = new StringBuilder();
-        //@todo Profiler as service in autoconfiguration
-        //@todo profiler.getTextReport();
+        //@todo-a Profiler as service in autoconfiguration
+        //@todo-a profiler.getTextReport();
         for (Map.Entry<String, AtomicInteger> entry : ProfilerAop.data.entrySet()) {
             String a = entry.getKey();
             AtomicInteger b = entry.getValue();
@@ -49,8 +49,8 @@ public class PaymentController {
         return paymentService.standaloneBuy(socNetUserId, itemPrice, orderId);
     }
 
-    // @todo produces default?
-    //@todo test removed curly braces
+    // @todo-a produces default?
+    //@todo-a test removed curly braces
     @PostMapping(value = "/service/web/vk_buy",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE

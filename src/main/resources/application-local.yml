@@ -10,7 +10,7 @@ socnet:
   vk:
     appId: 123456789
     secretKey: "vk_secret_key"
-# @todo vk secretKey and teelgram token???
+# @todo-a vk secretKey and teelgram token???
 alerter:
   telegram:
     chatId: -1234567890123

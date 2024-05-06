@@ -26,7 +26,7 @@ public class TopicGameListener {
     private final MapService mapService;
     private final PaymentService paymentService;
 
-    //@todo aop proxy getUserId and return auto userId set?
+    //@todo-a aop proxy getUserId and return auto userId set?
     @KafkaHandler
     public GotMapInfoRsDto sendMeMapInfoRqDto(@Valid SendMeMapInfoRqDto rq) {
         return mapService.getMapInfo(rq.getUserId(), rq.getMapId());
@@ -62,8 +62,8 @@ public class TopicGameListener {
         return mapService.buyHealth(rq.getUserId(), rq.getIndex());
     }
 
-    //@todo Buy [ Hummer, Lightning, Shuffle ] RqDto.
-    //@todo Used [ Hummer, Lightning, Shuffle ] RqDto.
+    //@todo-a Buy [ Hummer, Lightning, Shuffle ] RqDto.
+    //@todo-a Used [ Hummer, Lightning, Shuffle ] RqDto.
     @KafkaHandler
     public GotStuffRsDto buyHummer(@Valid BuyHummerRqDto rq) {
         return mapService.buyProduct(rq.getUserId(), rq.getIndex(), ObjectEnum.STUFF_HUMMER);
@@ -94,7 +94,7 @@ public class TopicGameListener {
         return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_SHUFFLE);
     }
 
-    //@todo is code used?
+    //@todo-a is code used?
     @KafkaHandler
     public DoOrderChangeAnswerRsDto doOrderChange(@Valid DoOrderChangeRqDto rq) {
         return paymentService.doOrderChange(

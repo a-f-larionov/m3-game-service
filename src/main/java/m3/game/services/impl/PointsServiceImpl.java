@@ -19,11 +19,11 @@ public class PointsServiceImpl implements PointsService {
     @Override
     public List<PointDto> getPointsByMapId(Long mapId) {
 
-        //@todo long -> int, because array.length is integer
+        //@todo-a long -> int, because array.length is integer
         Long firstPointId = MapSettings.getFirstPointId(mapId);
         Long lastPointId = MapSettings.getLastPointId(mapId);
 
-        //@todo points = getByIdFromTo(fId, lId);
+        //@todo-a points = getByIdFromTo(fId, lId);
         List<PointDto> points = new ArrayList<>();
         for (Long id = firstPointId; id <= lastPointId; id++) {
             points.add(getById(id));
@@ -32,7 +32,7 @@ public class PointsServiceImpl implements PointsService {
     }
 
     public PointDto getById(Long id) {
-        // @todo getById
+        // @todo-a getById
         return PointStore.points.stream()
                 .filter(p -> p.getId().equals(id))
                 .findFirst()

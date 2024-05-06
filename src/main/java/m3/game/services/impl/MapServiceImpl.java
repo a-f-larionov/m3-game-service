@@ -50,7 +50,7 @@ public class MapServiceImpl implements MapService {
     private final MapMapper mapMapper;
     private final StuffMapper stuffMapper;
     private final ScoreMapper scoreMapper;
-    //@todo code analyze
+    //@todo-a code analyze
     private final PaymentMapper paymentMapper;
     private final UserRepository userRepository;
     private final UserPointRepository userPointRepository;
@@ -61,14 +61,14 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public boolean existsMap(Long mapId) {
-        //@todo ?
+        //@todo-a ?
         return MapStore.maps.stream()
                 .anyMatch(m -> m.getId().equals(mapId));
     }
 
     @Override
     public MapDto getById(Long mapId) {
-        //@todo getById
+        //@todo-a getById
         return MapStore.maps.stream()
                 .filter(m -> m.getId().equals(mapId))
                 .findFirst()
@@ -77,7 +77,7 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public GotMapInfoRsDto getMapInfo(Long userId, Long mapId) {
-        // @todo user set to first positions
+        // @todo-a user set to first positions
         var map = getById(mapId);
         var points = pointsService.getPointsByMapId(mapId);
         return mapMapper.entitiesToRsDto(
@@ -96,7 +96,7 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public void onFinish(Long userId, Long pointId, Long score, Long chestId) {
-        // @todo transactional one for all methods
+        // @todo-a transactional one for all methods
         isUserExistsOrThrowException(userId);
 
         updateUserPoint(userId, pointId, score);
@@ -130,7 +130,7 @@ public class MapServiceImpl implements MapService {
         if (userStuff.isEmpty()) {
             userStuffRepository.creatUserStuff(userId);
             userStuff = userStuffRepository.findById(userId);
-            //@todo just get?
+            //@todo-a just get?
         }
         return stuffMapper.entityToDto(userStuff.get());
     }
@@ -162,7 +162,7 @@ public class MapServiceImpl implements MapService {
 
         stuffService.sendStuffToUser(userId);
 
-        //@Todo transaction control!
+        //@todo-a transaction control!
         commonSender.statistic(userId, StatisticEnum.ID_OPEN_CHEST, chestId.toString());
     }
 
@@ -171,7 +171,7 @@ public class MapServiceImpl implements MapService {
         var product = ShopStore.turnsUp;
         var userStuff = stuffService.getUserStuff(userId);
         System.out.println(userStuff);
-        //@todo find any System.out.println();
+        //@todo-a find any System.out.println();
         decrementStuff(userStuff, product.getPriceGold(), ObjectEnum.STUFF_GOLD);
 
         userStuffRepository.save(userStuff);
@@ -246,7 +246,7 @@ public class MapServiceImpl implements MapService {
     }
 
     private static StatisticEnum getStatIdFromObjectId(ProductDto product) {
-        //@todo may be one statisitc BUY_ITEM with param id product?
+        //@todo-a may be one statisitc BUY_ITEM with param id product?
         return switch (product.getObjectEnum()) {
             case STUFF_HUMMER -> StatisticEnum.ID_BUY_HUMMER;
             case STUFF_LIGHTNING -> StatisticEnum.ID_BUY_LIGHTNING;
@@ -286,7 +286,7 @@ public class MapServiceImpl implements MapService {
     }
 
     private void isUserExistsOrThrowException(Long userId) {
-        //@todo method just call method
+        //@todo-a method just call method
         getUserById(userId);
     }
 
