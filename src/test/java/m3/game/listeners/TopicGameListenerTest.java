@@ -302,34 +302,6 @@ class TopicGameListenerTest {
                 .spendMagic(userId, ObjectEnum.STUFF_SHUFFLE);
     }
 
-    @Test
-    void doOrderChange() {
-        // given
-        var tid = 100L;
-        Long socNetUserId = 300L;
-        Long extOrderId = 200L;
-        Long itemPrice = 400L;
-        var rq = DoOrderChangeRqDto.builder()
-                .tid(tid)
-                .receiverId(socNetUserId)
-                .orderId(extOrderId)
-                .itemPrice(itemPrice)
-                .socNetType(SocNetType.VK)
-                .build();
-
-        // when
-        gameListener.doOrderChange(rq);
-
-        // then
-        verify(paymentService).doOrderChange(
-                eq(tid),
-                eq(SocNetType.VK),
-                eq(socNetUserId),
-                eq(itemPrice),
-                eq(extOrderId)
-        );
-    }
-
     private static GotStuffRsDto buildGotStuffRsDto(Long userId, Long gold, Long hummer, Long lightning, Long shuffle) {
         return GotStuffRsDto.builder()
                 .userId(userId)

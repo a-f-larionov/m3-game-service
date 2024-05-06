@@ -93,18 +93,6 @@ public class TopicGameListener {
         return mapService.spendMagic(rq.getUserId(), ObjectEnum.STUFF_SHUFFLE);
     }
 
-    //@todo-a is code used?
-    @KafkaHandler
-    public DoOrderChangeAnswerRsDto doOrderChange(@Valid DoOrderChangeRqDto rq) {
-        return paymentService.doOrderChange(
-                rq.getTid(),
-                rq.getSocNetType(),
-                rq.getReceiverId(),
-                rq.getItemPrice(),
-                rq.getOrderId()
-        );
-    }
-
     @KafkaHandler
     public void exitGame(@Valid ExitGameRqDto rq) {
         mapService.exitGame(rq.getUserId(), rq.getPointId());
