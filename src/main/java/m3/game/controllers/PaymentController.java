@@ -49,7 +49,6 @@ public class PaymentController {
         return paymentService.standaloneBuy(socNetUserId, itemPrice, orderId);
     }
 
-    // @todo-a produces default?
     //@todo-a test removed curly braces
     @PostMapping(value = "/service/web/vk_buy",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,

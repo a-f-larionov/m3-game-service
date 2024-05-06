@@ -96,7 +96,7 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public void onFinish(Long userId, Long pointId, Long score, Long chestId) {
-        // @todo-a transactional one for all methods
+        // @todo-a transactional one for all methods set @Transactional to alll listeners and controllers
         isUserExistsOrThrowException(userId);
 
         updateUserPoint(userId, pointId, score);

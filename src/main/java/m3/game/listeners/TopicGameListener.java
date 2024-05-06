@@ -26,7 +26,6 @@ public class TopicGameListener {
     private final MapService mapService;
     private final PaymentService paymentService;
 
-    //@todo-a aop proxy getUserId and return auto userId set?
     @KafkaHandler
     public GotMapInfoRsDto sendMeMapInfoRqDto(@Valid SendMeMapInfoRqDto rq) {
         return mapService.getMapInfo(rq.getUserId(), rq.getMapId());
