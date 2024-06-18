@@ -28,7 +28,7 @@ public class PaymentController {
     // @todo-a devide controllers
     // @todo-a /service -> /payment
 
-    @GetMapping("/service/web/profiler")
+    @GetMapping("/service/profiler")
     public String methodProfiles() {
         StringBuilder out = new StringBuilder();
         //@todo-a Profiler as service in autoconfiguration
@@ -41,7 +41,7 @@ public class PaymentController {
         return out.toString();
     }
 
-    @GetMapping("/service/web/standalone_buy")
+    @GetMapping("/payments/standalone_buy")
     public DoOrderChangeAnswerRsDto standaloneBuyGet(
             @RequestParam("receiver_id") @NotNull Long socNetUserId,
             @RequestParam("order_id") @NotNull Long orderId,
@@ -50,7 +50,7 @@ public class PaymentController {
     }
 
     //@todo-a test removed curly braces
-    @PostMapping(value = "/service/web/vk_buy",
+    @PostMapping(value = "/payments/vk_buy",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
